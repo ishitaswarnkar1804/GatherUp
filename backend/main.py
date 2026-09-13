@@ -29,13 +29,6 @@ app = FastAPI(
 )
 
 
-@app.on_event("startup")
-def ensure_email_verification_table():
-    EmailVerification.__table__.create(
-        bind=engine,
-        checkfirst=True
-    )
-
 
 @app.on_event("startup")
 def ensure_poll_tables():

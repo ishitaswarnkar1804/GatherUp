@@ -15,8 +15,6 @@ from backend.routers.tasks import router as tasks_router
 from backend.routers.food import router as food_router
 from backend.routers.gallery import router as gallery_router
 from backend.routers.notifications import router as notifications_router
-from backend.database import engine
-from backend.models import EmailVerification, Poll, PollOption, PollVote
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,17 +25,6 @@ app = FastAPI(
     title="GatherUp API",
     version="1.0.0"
 )
-
-
-
-@app.on_event("startup")
-def ensure_poll_tables():
-    # These tables power the Polls feature. checkfirst=True means this is
-    # purely additive: it creates the tables only if they don't already
-    # exist, and never touches any existing table or data.
-    Poll.__table__.create(bind=engine, checkfirst=True)
-    PollOption.__table__.create(bind=engine, checkfirst=True)
-    PollVote.__table__.create(bind=engine, checkfirst=True)
 
 
 app.include_router(auth_router)

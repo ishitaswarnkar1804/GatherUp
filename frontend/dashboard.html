@@ -1,0 +1,3100 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+    <meta name="theme-color" content="#fffaf0">
+
+    <link rel="icon" href="/assets/icons/icon-512.png">
+
+    <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+
+    <link rel="manifest" href="/manifest.json">
+
+    <title>Dashboard — GatherUp</title>
+
+    <link rel="stylesheet" href="/assets/style.css">
+
+    <style>
+        :root {
+            --cream: #fffaf0;
+            --paper: #fffdf8;
+            --ink: #25221d;
+            --muted: #777168;
+            --yellow: #ffd84d;
+            --orange: #ff9f43;
+            --pink: #ff7ca8;
+            --purple: #9b8cff;
+            --blue: #70c8ff;
+            --green: #75d6a3;
+            --border: rgba(37, 34, 29, .09);
+            --shadow: 0 20px 50px rgba(55, 43, 20, .08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body.app-page {
+            margin: 0;
+            background:
+                radial-gradient(circle at 10% 5%,
+                    rgba(255, 216, 77, .28),
+                    transparent 28%),
+                radial-gradient(circle at 90% 10%,
+                    rgba(155, 140, 255, .20),
+                    transparent 25%),
+                var(--cream);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        .dashboard-shell {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .dashboard-sidebar {
+            width: 250px;
+            min-height: 100vh;
+            padding: 26px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: rgba(255, 253, 248, .88);
+            backdrop-filter: blur(22px);
+            border-right: 1px solid var(--border);
+            z-index: 20;
+        }
+
+        .dashboard-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 10px 30px;
+            text-decoration: none;
+            color: var(--ink);
+        }
+
+        .dashboard-brand img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+        }
+
+        .dashboard-brand strong {
+            font-size: 22px;
+            letter-spacing: -.7px;
+        }
+
+        .dashboard-brand strong span {
+            color: #e5a900;
+        }
+
+        .side-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            color: #aaa198;
+            padding: 0 12px;
+            margin: 14px 0 9px;
+        }
+
+        .side-nav {
+            display: grid;
+            gap: 5px;
+        }
+
+        .side-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 13px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #686158;
+            font-size: 14px;
+            font-weight: 650;
+            transition: .22s ease;
+        }
+
+        .side-nav a:hover {
+            transform: translateX(3px);
+            background: #fff4c8;
+            color: var(--ink);
+        }
+
+        .side-nav a.active {
+            background: var(--yellow);
+            color: var(--ink);
+            box-shadow: 0 9px 20px rgba(255, 216, 77, .24);
+        }
+
+        .side-icon {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .58);
+            font-size: 15px;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            left: 18px;
+            right: 18px;
+            bottom: 20px;
+        }
+
+        .mini-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            box-shadow: 0 10px 30px rgba(50, 40, 20, .05);
+        }
+
+        .mini-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #ffd84d, #ff9f43);
+            font-weight: 900;
+        }
+
+        .mini-user-info {
+            min-width: 0;
+        }
+
+        .mini-user-info strong {
+            display: block;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mini-user-info small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logout-btn {
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .dashboard-main {
+            width: calc(100% - 250px);
+            margin-left: 250px;
+            padding: 28px 34px 50px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .topbar-left small {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            color: #a39a8f;
+            margin-bottom: 7px;
+        }
+
+        .topbar-left h1 {
+            margin: 0;
+            font-size: clamp(30px, 4vw, 48px);
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .topbar-left h1 span {
+            position: relative;
+            display: inline-block;
+        }
+
+        .topbar-left h1 span::after {
+            content: "";
+            position: absolute;
+            height: 7px;
+            left: 2px;
+            right: 2px;
+            bottom: -5px;
+            background: var(--yellow);
+            border-radius: 99px;
+            z-index: -1;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .round-action {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            transition: .2s ease;
+        }
+
+        .round-action:hover {
+            transform: translateY(-3px) rotate(2deg);
+            box-shadow: var(--shadow);
+        }
+
+        .create-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 13px 18px;
+            border-radius: 14px;
+            background: var(--ink);
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 750;
+            transition: .2s ease;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(37, 34, 29, .16);
+        }
+
+        .join-btn {
+            background: #fff;
+            color: var(--ink);
+            border: 1px solid var(--border);
+        }
+
+        .join-btn:hover {
+            background: #fff4c8;
+            box-shadow: 0 15px 30px rgba(50, 40, 20, .09);
+        }
+
+        .top-actions {
+            flex-wrap: wrap;
+        }
+
+        .dashboard-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .dashboard-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            border-radius: 16px;
+            background: #fffcf5;
+            border: 1px solid rgba(37, 34, 29, .07);
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .dashboard-list-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 22px rgba(50, 40, 20, .06);
+        }
+
+        .dashboard-list-icon {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: #fff0ad;
+            font-size: 18px;
+        }
+
+        .dashboard-list-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .dashboard-list-info strong {
+            display: block;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dashboard-list-info span {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dashboard-list-badge {
+            flex: 0 0 auto;
+            padding: 6px 8px;
+            border-radius: 9px;
+            background: #f5f0e5;
+            color: #75694f;
+            font-size: 9px;
+            font-weight: 850;
+        }
+
+        .dashboard-mini-empty {
+            min-height: 150px;
+        }
+
+        .dashboard-error {
+            color: #b34b4b;
+        }
+
+        @media (max-width: 780px) {
+            .top-actions {
+                gap: 7px;
+            }
+
+            .join-btn {
+                display: none;
+            }
+        }
+
+        .hero-card {
+            position: relative;
+            overflow: hidden;
+            min-height: 220px;
+            padding: 30px;
+            border-radius: 28px;
+            background:
+                radial-gradient(circle at 85% 20%,
+                    rgba(255, 255, 255, .65),
+                    transparent 25%),
+                linear-gradient(135deg,
+                    #ffd84d,
+                    #ffbd62);
+            box-shadow: 0 24px 60px rgba(225, 160, 40, .17);
+            margin-bottom: 24px;
+        }
+
+        .hero-card::before {
+            content: "";
+            position: absolute;
+            width: 210px;
+            height: 210px;
+            border-radius: 50%;
+            right: -55px;
+            bottom: -100px;
+            background: rgba(255, 255, 255, .35);
+        }
+
+        .hero-card::after {
+            content: "✦";
+            position: absolute;
+            right: 105px;
+            top: 25px;
+            font-size: 35px;
+            animation: floatStar 3s ease-in-out infinite;
+        }
+
+        @keyframes floatStar {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0);
+            }
+
+            50% {
+                transform: translateY(-8px) rotate(8deg);
+            }
+        }
+
+        .hero-card-content {
+            position: relative;
+            z-index: 2;
+            max-width: 620px;
+        }
+
+        .hero-card-content .eyebrow {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: .62;
+        }
+
+        .hero-card h2 {
+            font-size: clamp(27px, 4vw, 40px);
+            margin: 10px 0;
+            letter-spacing: -1.5px;
+        }
+
+        .hero-card p {
+            margin: 0;
+            max-width: 510px;
+            color: rgba(37, 34, 29, .68);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .hero-decoration {
+            position: absolute;
+            right: 40px;
+            bottom: 20px;
+            width: 145px;
+            height: 145px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, .25);
+            transform: rotate(14deg);
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+
+        .overview-card {
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 20px;
+            min-height: 125px;
+            transition: .25s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .overview-card::after {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            right: -28px;
+            bottom: -35px;
+            opacity: .55;
+        }
+
+        .overview-card:nth-child(1)::after {
+            background: var(--yellow);
+        }
+
+        .overview-card:nth-child(2)::after {
+            background: var(--pink);
+        }
+
+        .overview-card:nth-child(3)::after {
+            background: var(--blue);
+        }
+
+        .overview-card:nth-child(4)::after {
+            background: var(--green);
+        }
+
+        .overview-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: #faf6ed;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .overview-card small {
+            display: block;
+            color: #91887d;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .overview-value {
+            display: block;
+            font-size: 26px;
+            font-weight: 850;
+            margin-top: 4px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 18px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, .88);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 22px;
+            box-shadow: 0 12px 35px rgba(50, 40, 20, .045);
+        }
+
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .card-head h3 {
+            margin: 0;
+            font-size: 17px;
+            letter-spacing: -.4px;
+        }
+
+        .card-head a {
+            font-size: 11px;
+            font-weight: 800;
+            color: #9b7600;
+            text-decoration: none;
+        }
+
+        .empty-state {
+            min-height: 170px;
+            border-radius: 18px;
+            border: 1px dashed rgba(37, 34, 29, .13);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 25px;
+            background: #fffcf5;
+        }
+
+        .empty-state-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            background: #fff0ad;
+            margin-bottom: 10px;
+            font-size: 21px;
+        }
+
+        .empty-state strong {
+            font-size: 14px;
+        }
+
+        .empty-state p {
+            max-width: 360px;
+            margin: 6px 0 0;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(37, 34, 29, .42);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+            animation: modalFade .2s ease;
+        }
+
+        @keyframes modalFade {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .group-modal {
+            width: min(100%, 480px);
+            background: #fffdf8;
+            border: 1px solid rgba(37, 34, 29, .09);
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 30px 90px rgba(37, 34, 29, .2);
+            animation: modalUp .25s ease;
+        }
+
+        @keyframes modalUp {
+            from {
+                transform: translateY(15px) scale(.98);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .modal-top h3 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: -.8px;
+        }
+
+        .modal-top p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .modal-close {
+            width: 38px;
+            height: 38px;
+            border: 0;
+            border-radius: 12px;
+            background: #f5f0e5;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .group-form-field {
+            margin-bottom: 15px;
+        }
+
+        .group-form-field label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #655e55;
+        }
+
+        .group-form-field input,
+        .group-form-field textarea {
+            width: 100%;
+            border: 1px solid rgba(37, 34, 29, .11);
+            border-radius: 14px;
+            background: #fff;
+            padding: 13px 14px;
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+            resize: vertical;
+        }
+
+        .group-form-field input:focus,
+        .group-form-field textarea:focus {
+            border-color: #e5b52e;
+            box-shadow: 0 0 0 4px rgba(255, 216, 77, .18);
+        }
+
+        .modal-submit {
+            width: 100%;
+            border: 0;
+            border-radius: 15px;
+            padding: 14px;
+            background: var(--ink);
+            color: #fff;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .modal-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(37, 34, 29, .15);
+        }
+
+        .modal-submit:disabled {
+            opacity: .55;
+            cursor: wait;
+            transform: none;
+        }
+
+        .modal-message {
+            min-height: 18px;
+            margin: 10px 0 0;
+            font-size: 11px;
+            text-align: center;
+            color: #b34b4b;
+        }
+
+        .group-tools {
+            display: flex;
+            gap: 8px;
+        }
+
+        .group-tool-btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 8px 10px;
+            background: #fff4c8;
+            color: #6d5700;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .group-tool-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .group-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 14px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #fff9df, #fff);
+            border: 1px solid rgba(37, 34, 29, .08);
+            transition: .22s ease;
+            margin-bottom: 10px;
+        }
+
+        .group-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .group-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(50, 40, 20, .08);
+        }
+
+        .group-item-icon {
+            width: 44px;
+            height: 44px;
+            flex: 0 0 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ffd84d, #ff9f43);
+            font-size: 20px;
+        }
+
+        .group-item-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .group-item-info strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .group-item-info span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .group-item-code {
+            padding: 7px 9px;
+            border-radius: 9px;
+            background: #f5f0e5;
+            color: #75694f;
+            font-size: 9px;
+            font-weight: 850;
+            letter-spacing: 1px;
+            flex: 0 0 auto;
+        }
+
+        .groups-empty {
+            min-height: 170px;
+            border-radius: 18px;
+            border: 1px dashed rgba(37, 34, 29, .13);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 25px;
+            background: #fffcf5;
+        }
+
+        @media (max-width: 500px) {
+            .group-item {
+                align-items: flex-start;
+            }
+
+            .group-item-code {
+                display: none;
+            }
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .quick-action {
+            min-height: 105px;
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: var(--ink);
+            transition: .22s ease;
+            display: block;
+            width: 100%;
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(50, 40, 20, .07);
+        }
+
+        .quick-action:nth-child(1) {
+            background: #fff3b8;
+        }
+
+        .quick-action:nth-child(2) {
+            background: #ffe0ec;
+        }
+
+        .quick-action:nth-child(3) {
+            background: #dff4ff;
+        }
+
+        .quick-action:nth-child(4) {
+            background: #e1f8eb;
+        }
+
+        .quick-action-icon {
+            font-size: 21px;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .quick-action strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .quick-action span {
+            font-size: 10px;
+            color: #777067;
+        }
+
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: var(--cream);
+            display: grid;
+            place-items: center;
+        }
+
+        .loading-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+            transition: .3s ease;
+        }
+
+        .loader-logo {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            animation: pulseLogo 1.1s ease-in-out infinite;
+        }
+
+        @keyframes pulseLogo {
+
+            0%,
+            100% {
+                transform: scale(.94);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @media (max-width: 1100px) {
+
+            .overview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 780px) {
+
+            .dashboard-sidebar {
+                width: 72px;
+                padding: 20px 10px;
+            }
+
+            .dashboard-brand {
+                justify-content: center;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .dashboard-brand strong,
+            .side-label,
+            .side-nav a span:not(.side-icon),
+            .mini-user-info,
+            .logout-btn {
+                display: none;
+            }
+
+            .side-nav a {
+                justify-content: center;
+                padding: 10px;
+            }
+
+            .sidebar-bottom {
+                left: 10px;
+                right: 10px;
+            }
+
+            .mini-user {
+                justify-content: center;
+                padding: 7px;
+            }
+
+            .dashboard-main {
+                width: calc(100% - 72px);
+                margin-left: 72px;
+                padding: 22px 15px 35px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .create-btn {
+                font-size: 0;
+                width: 44px;
+                height: 44px;
+                padding: 0;
+                justify-content: center;
+            }
+
+            .create-btn span {
+                font-size: 20px;
+            }
+
+            .hero-card {
+                padding: 23px;
+            }
+
+        }
+
+        @media (max-width: 500px) {
+
+            .overview-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 9px;
+            }
+
+            .overview-card {
+                padding: 14px;
+                min-height: 112px;
+            }
+
+            .overview-value {
+                font-size: 22px;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .top-actions .round-action {
+                display: none;
+            }
+
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 99px;
+            display: none;
+            place-items: center;
+            background: #ff5f7a;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 900;
+            border: 2px solid #fff;
+        }
+
+        .notification-action {
+            position: relative;
+        }
+
+        .notification-list {
+            display: grid;
+            gap: 9px;
+            max-height: 58vh;
+            overflow: auto;
+        }
+
+        .notification-item {
+            display: grid;
+            grid-template-columns: 40px 1fr auto;
+            gap: 11px;
+            align-items: start;
+            padding: 13px;
+            border-radius: 16px;
+            background: #fff;
+            border: 1px solid rgba(37, 34, 29, .08);
+            transition: .2s ease;
+        }
+
+        .notification-item.unread {
+            background: #fff9df;
+            border-color: rgba(255, 216, 77, .55);
+        }
+
+        .notification-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(50, 40, 20, .06);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: #fff0ad;
+            font-size: 18px;
+        }
+
+        .notification-content {
+            min-width: 0;
+        }
+
+        .notification-content strong {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .notification-content p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .notification-content small {
+            display: block;
+            margin-top: 6px;
+            color: #aaa198;
+            font-size: 9px;
+        }
+
+        .notification-tools {
+            display: flex;
+            gap: 5px;
+        }
+
+        .notification-tools button {
+            border: 0;
+            background: #f5f0e5;
+            border-radius: 9px;
+            width: 29px;
+            height: 29px;
+            cursor: pointer;
+        }
+
+        .modal-actions-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 13px;
+        }
+
+        .modal-actions-row button {
+            border: 0;
+            border-radius: 10px;
+            padding: 8px 11px;
+            background: #fff0ad;
+            color: #6d5700;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .workspace-picker-list {
+            display: grid;
+            gap: 9px;
+            max-height: 52vh;
+            overflow: auto;
+        }
+
+        .workspace-picker-item {
+            width: 100%;
+            border: 1px solid rgba(41, 35, 31, .09);
+            background: #fff;
+            border-radius: 16px;
+            padding: 13px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .workspace-picker-item:hover {
+            transform: translateY(-2px);
+            background: #fff9df;
+            border-color: rgba(246, 196, 69, .65);
+        }
+
+        .workspace-picker-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            background: #fff0ad;
+            flex: 0 0 auto;
+        }
+
+        .workspace-picker-copy {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .workspace-picker-copy strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .workspace-picker-copy span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .workspace-picker-arrow {
+            font-size: 18px;
+            color: #aaa198;
+        }
+
+        .account-status {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 12px 13px;
+            border-radius: 14px;
+            background: #fff9df;
+            margin-bottom: 15px;
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .account-status.verified {
+            background: #e4f6e8;
+            color: #23633a;
+        }
+
+        .account-details {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .account-detail {
+            padding: 12px 13px;
+            border-radius: 13px;
+            background: #f8f4ec;
+        }
+
+        .account-detail small {
+            display: block;
+            color: #9b9087;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .8px;
+            margin-bottom: 4px;
+        }
+
+        .account-detail strong {
+            font-size: 12px;
+            word-break: break-word;
+        }
+
+        .chat-alert {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 500;
+            width: min(360px, calc(100vw - 30px));
+            padding: 15px;
+            border-radius: 18px;
+            background: #25221d;
+            color: #fff;
+            box-shadow: 0 22px 55px rgba(37,34,29,.25);
+            display: none;
+            cursor: pointer;
+        }
+
+        .chat-alert.show {
+            display: block;
+            animation: chatAlertIn .25s ease;
+        }
+
+        .chat-alert strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .chat-alert span {
+            display: block;
+            margin-top: 5px;
+            color: rgba(255,255,255,.72);
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        @keyframes chatAlertIn {
+            from { transform: translateY(15px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .chat-alert {
+                right: 15px;
+                bottom: 15px;
+            }
+
+            .notification-item {
+                grid-template-columns: 36px 1fr;
+            }
+
+            .notification-tools {
+                grid-column: 2;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body class="app-page">
+
+    <div class="noise"></div>
+
+
+    <div id="loadingScreen" class="loading-screen">
+        <img class="loader-logo" src="/assets/icons/logo.png" alt="GatherUp">
+    </div>
+
+
+    <div class="dashboard-shell">
+
+
+        <aside class="dashboard-sidebar">
+
+            <a class="dashboard-brand" href="/dashboard">
+
+                <img src="/assets/icons/logo.png" alt="GatherUp">
+
+                <strong>
+                    Gather<span>Up</span>
+                </strong>
+
+            </a>
+
+
+            <div class="side-label">
+                WORKSPACE
+            </div>
+
+
+            <nav class="side-nav">
+
+                <a class="active" href="/dashboard">
+                    <span class="side-icon">⌂</span>
+                    <span>Overview</span>
+                </a>
+
+                <a href="#" data-dashboard-action="groups">
+                    <span class="side-icon">👥</span>
+                    <span>Groups</span>
+                </a>
+
+                <a href="#" data-dashboard-action="event">
+                    <span class="side-icon">📅</span>
+                    <span>Events</span>
+                </a>
+
+                <a href="#" data-dashboard-action="expense">
+                    <span class="side-icon">💸</span>
+                    <span>Expenses</span>
+                </a>
+
+                <a href="#" data-dashboard-action="poll">
+                    <span class="side-icon">📊</span>
+                    <span>Polls</span>
+                </a>
+
+                <a href="#" data-dashboard-action="task">
+                    <span class="side-icon">✓</span>
+                    <span>Tasks</span>
+                </a>
+
+                <a href="#" data-dashboard-action="food">
+                    <span class="side-icon">🍕</span>
+                    <span>Food</span>
+                </a>
+
+                <a href="#" data-dashboard-action="gallery">
+                    <span class="side-icon">🖼️</span>
+                    <span>Gallery</span>
+                </a>
+                <a href="#" data-dashboard-action="chat">
+                    <span class="side-icon">💬</span>
+                    <span>Chat</span>
+                </a>
+
+            </nav>
+
+
+            <div class="side-label">
+                ACCOUNT
+            </div>
+
+
+            <nav class="side-nav">
+
+                <a href="#" data-dashboard-action="notifications">
+                    <span class="side-icon">🔔</span>
+                    <span>Notifications</span>
+                    <b class="notification-badge" id="sidebarNotificationBadge"></b>
+                </a>
+
+                <a href="#" data-dashboard-action="settings">
+                    <span class="side-icon">⚙</span>
+                    <span>Settings</span>
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-bottom">
+
+                <div class="mini-user">
+
+                    <div class="mini-avatar" id="sideAvatar">
+                        ?
+                    </div>
+
+                    <div class="mini-user-info">
+
+                        <strong id="sideUserName">
+                            Loading...
+                        </strong>
+
+                        <small id="sideUserEmail">
+                            Loading...
+                        </small>
+
+                    </div>
+
+                    <button id="logoutButton" class="logout-btn" title="Log out">
+                        ↪
+                    </button>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <main class="dashboard-main">
+
+
+            <div class="topbar">
+
+                <div class="topbar-left">
+
+                    <small>
+                        YOUR GATHERUP SPACE
+                    </small>
+
+                    <h1>
+                        Let's make a <span>plan.</span>
+                    </h1>
+
+                </div>
+
+
+                <div class="top-actions">
+
+                    <button class="round-action notification-action" id="dashboardNotificationButton" title="Notifications" type="button">
+                        🔔
+                        <b class="notification-badge" id="topNotificationBadge"></b>
+                    </button>
+
+                    <button type="button" class="create-btn join-btn" id="joinGroupButton">
+                        Join group
+                        <span>↗</span>
+                    </button>
+
+                    <button type="button" class="create-btn" id="createGroupButton">
+                        Create group
+                        <span>+</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <section class="hero-card">
+
+                <div class="hero-card-content">
+
+                    <div class="eyebrow">
+                        Welcome back
+                    </div>
+
+                    <h2 id="welcomeTitle">
+                        Loading...
+                    </h2>
+
+                    <p>
+                        Gather your people, organize the details,
+                        split the costs and make the whole plan
+                        feel effortless.
+                    </p>
+
+                </div>
+
+                <div class="hero-decoration"></div>
+
+            </section>
+
+
+            <section class="overview-grid">
+
+
+                <article class="overview-card">
+
+                    <div class="overview-icon">
+                        👥
+                    </div>
+
+                    <small>
+                        YOUR GROUPS
+                    </small>
+
+                    <strong class="overview-value" id="groupsCount">
+                        —
+                    </strong>
+
+                </article>
+
+
+                <article class="overview-card">
+
+                    <div class="overview-icon">
+                        📅
+                    </div>
+
+                    <small>
+                        UPCOMING EVENTS
+                    </small>
+
+                    <strong class="overview-value" id="eventsCount">
+                        —
+                    </strong>
+
+                </article>
+
+
+                <article class="overview-card">
+
+                    <div class="overview-icon">
+                        💸
+                    </div>
+
+                    <small>
+                        EXPENSES
+                    </small>
+
+                    <strong class="overview-value" id="expensesCount">
+                        —
+                    </strong>
+
+                </article>
+
+
+                <article class="overview-card">
+
+                    <div class="overview-icon">
+                        ✓
+                    </div>
+
+                    <small>
+                        OPEN TASKS
+                    </small>
+
+                    <strong class="overview-value" id="tasksCount">
+                        —
+                    </strong>
+
+                </article>
+
+
+            </section>
+
+
+            <section class="content-grid">
+
+
+                <div class="dashboard-card">
+
+                    <div class="card-head">
+
+                        <h3>
+                            Your groups
+                        </h3>
+
+                        <a href="#" data-dashboard-action="groups">
+                            View all →
+                        </a>
+
+                    </div>
+
+
+                    <div class="your-groups-container">
+                        <div class="groups-empty">
+                            <div class="empty-state-icon">
+                                👥
+                            </div>
+
+                            <strong>
+                                Loading your groups...
+                            </strong>
+
+                            <p>
+                                Gathering your shared spaces.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <div class="card-head">
+
+                        <h3>
+                            Quick actions
+                        </h3>
+
+                    </div>
+
+
+                    <div class="quick-grid">
+
+                        <button type="button" class="quick-action" id="quickNewGroup">
+
+                            <span class="quick-action-icon">
+                                👥
+                            </span>
+
+                            <strong>
+                                New group
+                            </strong>
+
+                            <span>
+                                Bring people together
+                            </span>
+
+                        </button>
+
+
+                        <button type="button" class="quick-action" id="quickPlanEvent">
+
+                            <span class="quick-action-icon">
+                                📅
+                            </span>
+
+                            <strong>
+                                Plan event
+                            </strong>
+
+                            <span>
+                                Pick the details
+                            </span>
+
+                        </button>
+
+
+                        <button type="button" class="quick-action" id="quickAddExpense">
+
+                            <span class="quick-action-icon">
+                                💸
+                            </span>
+
+                            <strong>
+                                Add expense
+                            </strong>
+
+                            <span>
+                                Split it fairly
+                            </span>
+
+                        </button>
+
+
+                        <button type="button" class="quick-action" id="quickStartPoll">
+
+                            <span class="quick-action-icon">
+                                📊
+                            </span>
+
+                            <strong>
+                                Start a poll
+                            </strong>
+
+                            <span>
+                                Let everyone decide
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <div class="card-head">
+
+                        <h3>
+                            Upcoming events
+                        </h3>
+
+                        <a href="#" data-dashboard-action="event">
+                            View calendar →
+                        </a>
+
+                    </div>
+
+
+                    <div id="dashboardEventsContainer" class="dashboard-list">
+                        <div class="empty-state dashboard-mini-empty">
+                            <div class="empty-state-icon">📅</div>
+                            <strong>Loading upcoming events...</strong>
+                            <p>Checking your shared group schedules.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <div class="card-head">
+
+                        <h3>
+                            Recent activity
+                        </h3>
+
+                    </div>
+
+
+                    <div id="dashboardActivityContainer" class="dashboard-list">
+                        <div class="empty-state dashboard-mini-empty">
+                            <div class="empty-state-icon">✨</div>
+                            <strong>Loading activity...</strong>
+                            <p>Checking your groups for recent updates.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+        </main>
+
+    </div>
+
+
+
+    <div class="modal-backdrop" id="joinGroupModal" aria-hidden="true">
+        <div class="group-modal" role="dialog" aria-modal="true" aria-labelledby="joinGroupModalTitle">
+            <div class="modal-top">
+                <div>
+                    <h3 id="joinGroupModalTitle">Join a group 👥</h3>
+                    <p>Enter the invite code shared by your group admin.</p>
+                </div>
+                <button type="button" class="modal-close" id="closeJoinGroupModal">×</button>
+            </div>
+
+            <form id="joinGroupForm">
+                <div class="group-form-field">
+                    <label for="inviteCode">INVITE CODE</label>
+                    <input id="inviteCode" type="text" maxlength="8" placeholder="e.g. 859VX4BH" autocomplete="off"
+                        required>
+                </div>
+
+                <button class="modal-submit" id="joinGroupSubmit" type="submit">
+                    Join group
+                </button>
+
+                <p class="modal-message" id="joinGroupModalMessage"></p>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="groupModal" aria-hidden="true">
+        <div class="group-modal" role="dialog" aria-modal="true" aria-labelledby="groupModalTitle">
+            <div class="modal-top">
+                <div>
+                    <h3 id="groupModalTitle">Create a group ✨</h3>
+                    <p>Bring your people together in one shared GatherUp space.</p>
+                </div>
+                <button type="button" class="modal-close" id="closeGroupModal">×</button>
+            </div>
+
+            <form id="createGroupForm">
+                <div class="group-form-field">
+                    <label for="groupName">GROUP NAME</label>
+                    <input id="groupName" type="text" maxlength="150" placeholder="e.g. Weekend Squad" required>
+                </div>
+
+                <div class="group-form-field">
+                    <label for="groupDescription">DESCRIPTION</label>
+                    <textarea id="groupDescription" rows="3" maxlength="500"
+                        placeholder="What are you planning together?"></textarea>
+                </div>
+
+                <button class="modal-submit" id="createGroupSubmit" type="submit">
+                    Create group
+                </button>
+
+                <p class="modal-message" id="groupModalMessage"></p>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="modal-backdrop" id="workspacePickerModal" aria-hidden="true">
+        <div class="group-modal" role="dialog" aria-modal="true" aria-labelledby="workspacePickerTitle">
+            <div class="modal-top">
+                <div>
+                    <h3 id="workspacePickerTitle">Choose a group</h3>
+                    <p id="workspacePickerSubtitle">Choose where you want to work.</p>
+                </div>
+                <button type="button" class="modal-close" id="closeWorkspacePicker">×</button>
+            </div>
+
+            <div id="workspacePickerList" class="workspace-picker-list">
+                <div class="groups-empty">
+                    <strong>Loading groups...</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="accountModal" aria-hidden="true">
+        <div class="group-modal" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+            <div class="modal-top">
+                <div>
+                    <h3 id="accountModalTitle">Your account ⚙</h3>
+                    <p>Your GatherUp account details.</p>
+                </div>
+                <button type="button" class="modal-close" id="closeAccountModal">×</button>
+            </div>
+
+            <div class="account-details">
+                <div class="account-detail">
+                    <small>NAME</small>
+                    <strong id="accountName">—</strong>
+                </div>
+                <div class="account-detail">
+                    <small>EMAIL</small>
+                    <strong id="accountEmail">—</strong>
+                </div>
+            </div>
+
+            <button class="modal-submit" type="button" id="accountLogoutButton">
+                Log out
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="notificationsModal" aria-hidden="true">
+        <div class="group-modal" role="dialog" aria-modal="true" aria-labelledby="notificationsModalTitle">
+            <div class="modal-top">
+                <div>
+                    <h3 id="notificationsModalTitle">Notifications 🔔</h3>
+                    <p>Your GatherUp updates, tasks, expenses, orders and chat alerts.</p>
+                </div>
+                <button type="button" class="modal-close" id="closeNotificationsModal">×</button>
+            </div>
+
+            <div class="modal-actions-row">
+                <button type="button" id="markAllNotificationsButton">Mark all as read</button>
+            </div>
+
+            <div id="dashboardNotificationsList" class="notification-list">
+                <div class="empty-state dashboard-mini-empty">
+                    <div class="empty-state-icon">🔔</div>
+                    <strong>Loading notifications...</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-alert" id="chatAlert" role="status" aria-live="polite">
+        <strong id="chatAlertTitle">New group message</strong>
+        <span id="chatAlertText"></span>
+    </div>
+
+    <script src="/assets/js/app.js?v=9"></script>
+
+
+    <script>
+        let dashboardGroups = [];
+        let dashboardEvents = [];
+        let dashboardPolls = [];
+        let dashboardExpenses = [];
+        let dashboardTasks = [];
+        let dashboardFoodOrders = [];
+        let dashboardGallery = [];
+        let dashboardNotifications = [];
+        let dashboardChatMessages = [];
+        let dashboardUser = null;
+        let chatPollingTimer = null;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const loadingScreen = document.getElementById("loadingScreen");
+            const token = localStorage.getItem("gatherup_token");
+
+            if (!token) {
+                window.location.href = "/login";
+                return;
+            }
+
+            try {
+                const userResponse = await apiFetch("/auth/me");
+
+                if (!userResponse.ok) {
+                    localStorage.removeItem("gatherup_token");
+                    window.location.href = "/login";
+                    return;
+                }
+
+                dashboardUser = await userResponse.json();
+
+                const fullName =
+                    `${dashboardUser.first_name} ${dashboardUser.last_name}`.trim();
+
+                document.getElementById("welcomeTitle").textContent =
+                    `Hey, ${dashboardUser.first_name}!`;
+
+                document.getElementById("sideUserName").textContent =
+                    fullName;
+
+                document.getElementById("sideUserEmail").textContent =
+                    dashboardUser.email;
+
+                document.getElementById("sideAvatar").textContent =
+                    dashboardUser.first_name.charAt(0).toUpperCase();
+
+                setupLogout();
+                setupGroupModal();
+                setupJoinGroupModal();
+                setupQuickActions();
+                setupNotificationModal();
+                setupDashboardNavigation();
+                setupWorkspacePicker();
+                setupAccountModal();
+
+                await loadGroups();
+                await loadDashboardData();
+                await loadNotifications();
+                startChatNotificationPolling();
+
+                loadingScreen?.classList.add("hide");
+            } catch (error) {
+                console.error("Dashboard initialization failed:", error);
+                loadingScreen?.classList.add("hide");
+                showDashboardError(error.message || "Unable to load dashboard data.");
+            }
+        });
+
+        function authHeaders() {
+            const token = localStorage.getItem("gatherup_token");
+            return {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            };
+        }
+
+        async function apiFetch(url, options = {}) {
+            const headers = {
+                ...authHeaders(),
+                ...(options.headers || {})
+            };
+
+            return fetch(url, {
+                ...options,
+                headers
+            });
+        }
+
+        async function fetchJson(url, fallback = []) {
+            try {
+                const response = await apiFetch(url);
+
+                if (!response.ok) {
+                    console.warn(`Dashboard request failed: ${url}`, response.status);
+                    return fallback;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.warn(`Dashboard request failed: ${url}`, error);
+                return fallback;
+            }
+        }
+
+        async function loadGroups() {
+            const response = await apiFetch("/groups");
+
+            if (!response.ok) {
+                throw new Error("Unable to load your groups.");
+            }
+
+            dashboardGroups = await response.json();
+
+            document.getElementById("groupsCount").textContent =
+                dashboardGroups.length;
+
+            renderGroups();
+        }
+
+        function renderGroups() {
+            const container =
+                document.querySelector(".your-groups-container");
+
+            if (!container) return;
+
+            if (!dashboardGroups.length) {
+                container.innerHTML = `
+                    <div class="groups-empty">
+                        <div class="empty-state-icon">👥</div>
+                        <strong>Your groups will appear here</strong>
+                        <p>Create your first group or join one using an invite code.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = dashboardGroups.map(group => `
+                <div
+                    class="group-item"
+                    role="button"
+                    tabindex="0"
+                    onclick="openGroup(${Number(group.id)})"
+                    onkeydown="if(event.key === 'Enter' || event.key === ' ') openGroup(${Number(group.id)})"
+                >
+                    <div class="group-item-icon">👥</div>
+                    <div class="group-item-info">
+                        <strong>${escapeHtml(group.name)}</strong>
+                        <span>${escapeHtml(group.description || "Your shared GatherUp space")}</span>
+                    </div>
+                    <div class="group-item-code">${escapeHtml(group.invite_code || "")}</div>
+                </div>
+            `).join("");
+        }
+
+        async function loadDashboardData() {
+            dashboardEvents = [];
+            dashboardPolls = [];
+            dashboardExpenses = [];
+            dashboardTasks = [];
+            dashboardFoodOrders = [];
+            dashboardGallery = [];
+
+            const requests = dashboardGroups.map(async group => {
+                const [
+                    events,
+                    polls,
+                    expenses,
+                    tasks,
+                    foodOrders,
+                    gallery
+                ] = await Promise.all([
+                    fetchJson(`/groups/${group.id}/events`),
+                    fetchJson(`/groups/${group.id}/polls`),
+                    fetchJson(`/groups/${group.id}/expenses`),
+                    fetchJson(`/groups/${group.id}/tasks`),
+                    fetchJson(`/groups/${group.id}/food-orders`),
+                    fetchJson(`/groups/${group.id}/gallery`)
+                ]);
+
+                const addGroup = (items, target) => {
+                    if (!Array.isArray(items)) return;
+                    target.push(
+                        ...items.map(item => ({
+                            ...item,
+                            group_name: group.name
+                        }))
+                    );
+                };
+
+                addGroup(events, dashboardEvents);
+                addGroup(polls, dashboardPolls);
+                addGroup(expenses, dashboardExpenses);
+                addGroup(tasks, dashboardTasks);
+                addGroup(foodOrders, dashboardFoodOrders);
+                addGroup(gallery, dashboardGallery);
+            });
+
+            await Promise.all(requests);
+
+            updateOverviewCounts();
+            renderUpcomingEvents();
+            renderDashboardActivity();
+        }
+
+        function updateOverviewCounts() {
+            const now = Date.now();
+
+            const upcomingEvents = dashboardEvents.filter(event => {
+                const date = eventDateValue(event);
+                return !date || date >= now;
+            });
+
+            const openTasks = dashboardTasks.filter(task =>
+                task.status !== "completed"
+            );
+
+            document.getElementById("eventsCount").textContent =
+                upcomingEvents.length;
+
+            document.getElementById("expensesCount").textContent =
+                dashboardExpenses.length;
+
+            document.getElementById("tasksCount").textContent =
+                openTasks.length;
+        }
+
+        function eventDateValue(event) {
+            if (!event.event_date) return null;
+
+            const value =
+                `${event.event_date}T${event.event_time || "23:59:59"}`;
+
+            const date = new Date(value).getTime();
+
+            return Number.isNaN(date) ? null : date;
+        }
+
+        function renderUpcomingEvents() {
+            const container =
+                document.getElementById("dashboardEventsContainer");
+
+            if (!container) return;
+
+            const now = Date.now();
+
+            const upcoming = dashboardEvents
+                .filter(event => {
+                    const date = eventDateValue(event);
+                    return date === null || date >= now;
+                })
+                .sort((a, b) => {
+                    const aDate = eventDateValue(a) ?? Number.MAX_SAFE_INTEGER;
+                    const bDate = eventDateValue(b) ?? Number.MAX_SAFE_INTEGER;
+                    return aDate - bDate;
+                })
+                .slice(0, 4);
+
+            if (!upcoming.length) {
+                container.innerHTML = `
+                    <div class="empty-state dashboard-mini-empty">
+                        <div class="empty-state-icon">📅</div>
+                        <strong>No upcoming events yet</strong>
+                        <p>Create an event inside one of your groups and it will appear here automatically.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = upcoming.map(event => `
+                <div class="dashboard-list-item" onclick="openGroup(${Number(event.group_id)})">
+                    <div class="dashboard-list-icon">📅</div>
+                    <div class="dashboard-list-info">
+                        <strong>${escapeHtml(event.title)}</strong>
+                        <span>
+                            ${escapeHtml(event.group_name)}
+                            · ${escapeHtml(formatDashboardDate(event))}
+                        </span>
+                    </div>
+                    <div class="dashboard-list-badge">
+                        ${escapeHtml(event.location || "Event")}
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function renderDashboardActivity() {
+            const container =
+                document.getElementById("dashboardActivityContainer");
+
+            if (!container) return;
+
+            const activities = [];
+
+            const pushItems = (items, icon, label, titleKey = "title") => {
+                items.forEach(item => {
+                    activities.push({
+                        icon,
+                        title: item[titleKey] ||
+                            item.question ||
+                            item.item_name ||
+                            "Update",
+                        detail: `${item.group_name} · ${label}`,
+                        groupId: item.group_id,
+                        time: item.created_at ||
+                            item.expense_date ||
+                            item.due_date
+                    });
+                });
+            };
+
+            pushItems(dashboardPolls, "📊", "Poll", "question");
+            pushItems(dashboardEvents, "📅", "Event");
+            pushItems(dashboardExpenses, "💸", "Expense");
+            pushItems(dashboardTasks, "✓", "Task");
+            pushItems(dashboardFoodOrders, "🍕", "Food order", "item_name");
+            pushItems(dashboardGallery, "🖼️", "Gallery item", "caption");
+
+            dashboardChatMessages.forEach(message => {
+                activities.push({
+                    icon: "💬",
+                    title: message.message || "New chat message",
+                    detail: `${message.group_name || "Group"} · Chat`,
+                    groupId: message.group_id,
+                    time: message.created_at
+                });
+            });
+
+            activities.sort((a, b) =>
+                new Date(b.time || 0) - new Date(a.time || 0)
+            );
+
+            const visible = activities.slice(0, 6);
+
+            if (!visible.length) {
+                container.innerHTML = `
+                    <div class="empty-state dashboard-mini-empty">
+                        <div class="empty-state-icon">✨</div>
+                        <strong>Your activity will show up here</strong>
+                        <p>Events, polls, expenses, tasks, food, gallery and chat updates will appear here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = visible.map(item => `
+                <div class="dashboard-list-item" onclick="openGroup(${Number(item.groupId)})">
+                    <div class="dashboard-list-icon">${item.icon}</div>
+                    <div class="dashboard-list-info">
+                        <strong>${escapeHtml(item.title)}</strong>
+                        <span>${escapeHtml(item.detail)}</span>
+                    </div>
+                    <div class="dashboard-list-badge">
+                        ${escapeHtml(formatRelativeDashboardTime(item.time))}
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        async function loadNotifications() {
+            dashboardNotifications =
+                await fetchJson("/notifications?unread_only=false", []);
+
+            const unread = await fetchJson("/notifications/unread-count", { count: 0 });
+
+            const unreadCount =
+                Number(unread?.count ?? dashboardNotifications.filter(n => !n.is_read).length);
+
+            updateNotificationBadges(unreadCount);
+            renderNotifications();
+        }
+
+        function updateNotificationBadges(count) {
+            const badges = [
+                document.getElementById("topNotificationBadge"),
+                document.getElementById("sidebarNotificationBadge")
+            ];
+
+            badges.forEach(badge => {
+                if (!badge) return;
+
+                badge.textContent = count > 99 ? "99+" : String(count);
+                badge.style.display = count > 0 ? "grid" : "none";
+            });
+        }
+
+        function renderNotifications() {
+            const container =
+                document.getElementById("dashboardNotificationsList");
+
+            if (!container) return;
+
+            if (!dashboardNotifications.length) {
+                container.innerHTML = `
+                    <div class="empty-state dashboard-mini-empty">
+                        <div class="empty-state-icon">🔔</div>
+                        <strong>You're all caught up</strong>
+                        <p>New GatherUp activity will appear here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = dashboardNotifications.map(notification => `
+                <article class="notification-item ${notification.is_read ? "" : "unread"}">
+                    <div class="notification-icon">
+                        ${notificationIcon(notification.type)}
+                    </div>
+
+                    <div class="notification-content">
+                        <strong>${escapeHtml(notification.title)}</strong>
+                        <p>${escapeHtml(notification.message)}</p>
+                        <small>${escapeHtml(formatRelativeDashboardTime(notification.created_at))}</small>
+                    </div>
+
+                    <div class="notification-tools">
+                        ${
+                            notification.is_read
+                                ? ""
+                                : `<button type="button" title="Mark as read" onclick="markNotificationRead(${Number(notification.id)}, event)">✓</button>`
+                        }
+                        <button type="button" title="Delete" onclick="deleteNotification(${Number(notification.id)}, event)">×</button>
+                    </div>
+                </article>
+            `).join("");
+        }
+
+        function notificationIcon(type) {
+            const icons = {
+                expense: "💸",
+                task_assigned: "✓",
+                task_completed: "✅",
+                food_order: "🍕",
+                food_status: "🍕",
+                gallery: "🖼️",
+                chat: "💬",
+                general: "🔔"
+            };
+
+            return icons[type] || "🔔";
+        }
+
+        function setupNotificationModal() {
+            const modal =
+                document.getElementById("notificationsModal");
+
+            const openButton =
+                document.getElementById("dashboardNotificationButton");
+
+            const closeButton =
+                document.getElementById("closeNotificationsModal");
+
+            const markAll =
+                document.getElementById("markAllNotificationsButton");
+
+            const open = async () => {
+                modal?.classList.add("open");
+                modal?.setAttribute("aria-hidden", "false");
+                requestBrowserNotificationPermission();
+                await loadNotifications();
+            };
+
+            const close = () => {
+                modal?.classList.remove("open");
+                modal?.setAttribute("aria-hidden", "true");
+            };
+
+            openButton?.addEventListener("click", open);
+            closeButton?.addEventListener("click", close);
+
+            modal?.addEventListener("click", event => {
+                if (event.target === modal) close();
+            });
+
+            markAll?.addEventListener("click", async () => {
+                try {
+                    const response = await apiFetch("/notifications/read-all", {
+                        method: "POST"
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Unable to mark notifications as read.");
+                    }
+
+                    await loadNotifications();
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        async function markNotificationRead(id, event) {
+            event?.stopPropagation();
+
+            try {
+                const response = await apiFetch(`/notifications/${id}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({ is_read: true })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Unable to update notification.");
+                }
+
+                await loadNotifications();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function deleteNotification(id, event) {
+            event?.stopPropagation();
+
+            try {
+                const response =
+                    await apiFetch(`/notifications/${id}`, {
+                        method: "DELETE"
+                    });
+
+                if (!response.ok) {
+                    throw new Error("Unable to delete notification.");
+                }
+
+                await loadNotifications();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function setupDashboardNavigation() {
+            document
+                .querySelectorAll("[data-dashboard-action]")
+                .forEach(link => {
+                    link.addEventListener("click", event => {
+                        event.preventDefault();
+
+                        const action = link.dataset.dashboardAction;
+
+                        if (action === "notifications") {
+                            document
+                                .getElementById("dashboardNotificationButton")
+                                ?.click();
+                            return;
+                        }
+
+                        if (action === "settings") {
+                            openAccountModal();
+                            return;
+                        }
+
+                        openGroupPicker(action);
+                    });
+                });
+        }
+
+        function setupQuickActions() {
+            document.getElementById("quickNewGroup")
+                ?.addEventListener("click", () =>
+                    document.getElementById("createGroupButton")?.click()
+                );
+
+            document.getElementById("quickPlanEvent")
+                ?.addEventListener("click", () =>
+                    openGroupPicker("event")
+                );
+
+            document.getElementById("quickAddExpense")
+                ?.addEventListener("click", () =>
+                    openGroupPicker("expense")
+                );
+
+            document.getElementById("quickStartPoll")
+                ?.addEventListener("click", () =>
+                    openGroupPicker("poll")
+                );
+        }
+
+        const groupActionLabels = {
+            groups: {
+                title: "Choose a group",
+                subtitle: "Open the group workspace you want to manage."
+            },
+            event: {
+                title: "Choose a group for your event",
+                subtitle: "Your event will open inside the selected group."
+            },
+            expense: {
+                title: "Choose a group for the expense",
+                subtitle: "Add the expense to the selected group."
+            },
+            poll: {
+                title: "Choose a group for the poll",
+                subtitle: "Start the poll inside the selected group."
+            },
+            task: {
+                title: "Choose a group for tasks",
+                subtitle: "Open the shared checklist for the selected group."
+            },
+            food: {
+                title: "Choose a group for food orders",
+                subtitle: "Open food ordering for the selected group."
+            },
+            gallery: {
+                title: "Choose a group for gallery",
+                subtitle: "Open the shared gallery for the selected group."
+            },
+            chat: {
+                title: "Choose a group for chat",
+                subtitle: "Open the conversation for the selected group."
+            }
+        };
+
+        function setupWorkspacePicker() {
+            const modal = document.getElementById("workspacePickerModal");
+            const closeButton = document.getElementById("closeWorkspacePicker");
+
+            closeButton?.addEventListener("click", () => {
+                modal?.classList.remove("open");
+                modal?.setAttribute("aria-hidden", "true");
+            });
+
+            modal?.addEventListener("click", event => {
+                if (event.target === modal) {
+                    modal.classList.remove("open");
+                    modal.setAttribute("aria-hidden", "true");
+                }
+            });
+        }
+
+        function openGroupPicker(action) {
+            if (!dashboardGroups.length) {
+                document.getElementById("createGroupButton")?.click();
+                return;
+            }
+
+            const modal = document.getElementById("workspacePickerModal");
+            const title = document.getElementById("workspacePickerTitle");
+            const subtitle = document.getElementById("workspacePickerSubtitle");
+            const list = document.getElementById("workspacePickerList");
+
+            const copy = groupActionLabels[action] || groupActionLabels.groups;
+
+            title.textContent = copy.title;
+            subtitle.textContent = copy.subtitle;
+
+            list.innerHTML = dashboardGroups.map(group => `
+                <button type="button"
+                    class="workspace-picker-item"
+                    data-group-id="${Number(group.id)}"
+                    data-action="${escapeHtml(action)}">
+                    <span class="workspace-picker-icon">👥</span>
+                    <span class="workspace-picker-copy">
+                        <strong>${escapeHtml(group.name)}</strong>
+                        <span>${escapeHtml(group.description || "Your shared GatherUp space")}</span>
+                    </span>
+                    <span class="workspace-picker-arrow">→</span>
+                </button>
+            `).join("");
+
+            list.querySelectorAll(".workspace-picker-item").forEach(button => {
+                button.addEventListener("click", () => {
+                    const groupId = Number(button.dataset.groupId);
+                    const selectedAction = button.dataset.action;
+                    closeGroupPicker();
+                    openGroupAction(groupId, selectedAction);
+                });
+            });
+
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+        }
+
+        function closeGroupPicker() {
+            const modal = document.getElementById("workspacePickerModal");
+            modal?.classList.remove("open");
+            modal?.setAttribute("aria-hidden", "true");
+        }
+
+        function openGroupAction(groupId, action) {
+            const routes = {
+                event: "#events",
+                expense: "#expenses",
+                poll: "#polls",
+                task: "#tasks",
+                food: "#food",
+                gallery: "#gallery",
+                chat: "#chat"
+            };
+
+            const hash = routes[action] || "";
+
+            window.location.href =
+                `/group?id=${Number(groupId)}${hash}`;
+        }
+
+        function setupAccountModal() {
+            const modal = document.getElementById("accountModal");
+            const closeButton = document.getElementById("closeAccountModal");
+            const logoutButton = document.getElementById("accountLogoutButton");
+
+            closeButton?.addEventListener("click", closeAccountModal);
+
+            modal?.addEventListener("click", event => {
+                if (event.target === modal) {
+                    closeAccountModal();
+                }
+            });
+
+            logoutButton?.addEventListener("click", () => {
+                clearInterval(chatPollingTimer);
+                localStorage.removeItem("gatherup_token");
+                window.location.href = "/login";
+            });
+        }
+
+        function openAccountModal() {
+            const modal = document.getElementById("accountModal");
+            const name = document.getElementById("accountName");
+            const email = document.getElementById("accountEmail");
+
+            if (!modal) return;
+
+            name.textContent =
+                `${dashboardUser?.first_name || ""} ${dashboardUser?.last_name || ""}`.trim() || "—";
+            email.textContent = dashboardUser?.email || "—";
+
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+        }
+
+        function closeAccountModal() {
+            const modal = document.getElementById("accountModal");
+            modal?.classList.remove("open");
+            modal?.setAttribute("aria-hidden", "true");
+        }
+
+        function requestBrowserNotificationPermission() {
+            if (!("Notification" in window)) return;
+
+            // Only prompt if the user hasn't already answered this before,
+            // otherwise we'd re-prompt on every page load.
+            if (Notification.permission === "default") {
+                Notification.requestPermission().catch(() => {});
+            }
+        }
+
+        async function startChatNotificationPolling() {
+            requestBrowserNotificationPermission();
+
+            await pollChatNotifications();
+
+            clearInterval(chatPollingTimer);
+
+            chatPollingTimer =
+                window.setInterval(
+                    pollChatNotifications,
+                    8000
+                );
+        }
+
+        async function pollChatNotifications() {
+            if (!dashboardGroups.length) return;
+
+            const allMessages = [];
+
+            for (const group of dashboardGroups) {
+                const messages =
+                    await fetchJson(
+                        `/groups/${group.id}/messages`,
+                        []
+                    );
+
+                if (!Array.isArray(messages)) continue;
+
+                const normalized = messages.map(message => ({
+                    ...message,
+                    group_id: group.id,
+                    group_name: group.name
+                }));
+
+                allMessages.push(...normalized);
+
+                if (!normalized.length) continue;
+
+                const latest =
+                    normalized
+                        .slice()
+                        .sort(
+                            (a, b) =>
+                                new Date(b.created_at || 0) -
+                                new Date(a.created_at || 0)
+                        )[0];
+
+                const storageKey =
+                    `gatherup_chat_seen_${group.id}`;
+
+                const previousSeen =
+                    localStorage.getItem(storageKey);
+
+                if (!previousSeen) {
+                    localStorage.setItem(
+                        storageKey,
+                        String(
+                            latest.created_at ||
+                            latest.id ||
+                            ""
+                        )
+                    );
+                    continue;
+                }
+
+                const previousTime =
+                    new Date(previousSeen).getTime();
+
+                const newMessages =
+                    normalized.filter(message => {
+                        const messageTime =
+                            new Date(message.created_at || 0).getTime();
+
+                        return (
+                            Number(message.user_id) !==
+                                Number(dashboardUser?.id) &&
+                            (
+                                messageTime > previousTime ||
+                                (
+                                    !message.created_at &&
+                                    Number(message.id) > Number(previousSeen)
+                                )
+                            )
+                        );
+                    });
+
+                if (newMessages.length) {
+                    const newest =
+                        newMessages[newMessages.length - 1];
+
+                    showChatAlert(newest);
+                    await loadNotifications();
+                }
+
+                localStorage.setItem(
+                    storageKey,
+                    String(
+                        latest.created_at ||
+                        latest.id ||
+                        previousSeen
+                    )
+                );
+            }
+
+            dashboardChatMessages =
+                allMessages
+                    .filter(message =>
+                        Number(message.user_id) !==
+                        Number(dashboardUser?.id)
+                    )
+                    .sort(
+                        (a, b) =>
+                            new Date(b.created_at || 0) -
+                            new Date(a.created_at || 0)
+                    )
+                    .slice(0, 4);
+
+            renderDashboardActivity();
+        }
+
+        function showChatAlert(message) {
+            const alertBox =
+                document.getElementById("chatAlert");
+
+            const title =
+                document.getElementById("chatAlertTitle");
+
+            const text =
+                document.getElementById("chatAlertText");
+
+            if (!alertBox || !title || !text) return;
+
+            const sender =
+                `${message.first_name || ""} ${message.last_name || ""}`
+                    .trim() || "Someone";
+
+            title.textContent =
+                `💬 ${sender} in ${message.group_name}`;
+
+            text.textContent =
+                message.message || "New group message";
+
+            alertBox.classList.add("show");
+
+            alertBox.onclick = () => {
+                openGroup(message.group_id);
+            };
+
+            window.clearTimeout(
+                window.__gatherUpChatAlertTimer
+            );
+
+            window.__gatherUpChatAlertTimer =
+                window.setTimeout(() => {
+                    alertBox.classList.remove("show");
+                }, 5000);
+
+            if (
+                "Notification" in window &&
+                Notification.permission === "granted"
+            ) {
+                new Notification(
+                    `New message in ${message.group_name}`,
+                    {
+                        body:
+                            `${sender}: ${message.message || "New message"}`
+                    }
+                );
+            }
+        }
+
+        function setupLogout() {
+            document
+                .getElementById("logoutButton")
+                ?.addEventListener("click", () => {
+                    clearInterval(chatPollingTimer);
+                    localStorage.removeItem("gatherup_token");
+                    window.location.href = "/login";
+                });
+        }
+
+        function setupJoinGroupModal() {
+            const modal = document.getElementById("joinGroupModal");
+            const openButton = document.getElementById("joinGroupButton");
+            const closeButton = document.getElementById("closeJoinGroupModal");
+            const form = document.getElementById("joinGroupForm");
+            const message = document.getElementById("joinGroupModalMessage");
+            const submit = document.getElementById("joinGroupSubmit");
+            const input = document.getElementById("inviteCode");
+
+            const openModal = () => {
+                modal?.classList.add("open");
+                modal?.setAttribute("aria-hidden", "false");
+                if (input) {
+                    input.value = "";
+                    input.focus();
+                }
+                if (message) message.textContent = "";
+            };
+
+            const closeModal = () => {
+                modal?.classList.remove("open");
+                modal?.setAttribute("aria-hidden", "true");
+                form?.reset();
+                if (message) message.textContent = "";
+            };
+
+            openButton?.addEventListener("click", openModal);
+            closeButton?.addEventListener("click", closeModal);
+
+            modal?.addEventListener("click", event => {
+                if (event.target === modal) closeModal();
+            });
+
+            input?.addEventListener("input", () => {
+                input.value = input.value
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]/g, "");
+            });
+
+            form?.addEventListener("submit", async event => {
+                event.preventDefault();
+
+                const inviteCode = input.value.trim().toUpperCase();
+
+                if (!inviteCode) {
+                    message.textContent = "Please enter an invite code.";
+                    return;
+                }
+
+                submit.disabled = true;
+                submit.textContent = "Joining...";
+                message.textContent = "";
+
+                try {
+                    const response = await apiFetch("/groups/join", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            invite_code: inviteCode
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            data.detail || "Unable to join group"
+                        );
+                    }
+
+                    closeModal();
+                    await loadGroups();
+                    await loadDashboardData();
+                    await loadNotifications();
+                } catch (error) {
+                    message.textContent = error.message;
+                } finally {
+                    submit.disabled = false;
+                    submit.textContent = "Join group";
+                }
+            });
+        }
+
+        function setupGroupModal() {
+            const modal = document.getElementById("groupModal");
+            const openButton = document.getElementById("createGroupButton");
+            const closeButton = document.getElementById("closeGroupModal");
+            const form = document.getElementById("createGroupForm");
+            const message = document.getElementById("groupModalMessage");
+            const submit = document.getElementById("createGroupSubmit");
+
+            const openModal = () => {
+                modal?.classList.add("open");
+                modal?.setAttribute("aria-hidden", "false");
+                document.getElementById("groupName")?.focus();
+            };
+
+            const closeModal = () => {
+                modal?.classList.remove("open");
+                modal?.setAttribute("aria-hidden", "true");
+                form?.reset();
+                if (message) message.textContent = "";
+            };
+
+            openButton?.addEventListener("click", openModal);
+            closeButton?.addEventListener("click", closeModal);
+
+            modal?.addEventListener("click", event => {
+                if (event.target === modal) closeModal();
+            });
+
+            form?.addEventListener("submit", async event => {
+                event.preventDefault();
+
+                const name =
+                    document.getElementById("groupName").value.trim();
+
+                const description =
+                    document.getElementById("groupDescription")
+                        .value.trim();
+
+                if (!name) {
+                    message.textContent = "Please enter a group name.";
+                    return;
+                }
+
+                submit.disabled = true;
+                submit.textContent = "Creating group...";
+                message.textContent = "";
+
+                try {
+                    const response = await apiFetch("/groups", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            name,
+                            description: description || null
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            data.detail || "Unable to create group"
+                        );
+                    }
+
+                    closeModal();
+                    await loadGroups();
+                    await loadDashboardData();
+                    await loadNotifications();
+                } catch (error) {
+                    message.textContent = error.message;
+                } finally {
+                    submit.disabled = false;
+                    submit.textContent = "Create group";
+                }
+            });
+        }
+
+        function formatDashboardDate(event) {
+            if (!event.event_date) return "Date not set";
+
+            const date = new Date(
+                `${event.event_date}T${event.event_time || "12:00:00"}`
+            );
+
+            if (Number.isNaN(date.getTime())) {
+                return event.event_date;
+            }
+
+            return date.toLocaleDateString(undefined, {
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            });
+        }
+
+        function formatRelativeDashboardTime(value) {
+            if (!value) return "Recent";
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) return "Recent";
+
+            const diff = Math.max(0, Date.now() - date.getTime());
+            const minutes = Math.floor(diff / 60000);
+
+            if (minutes < 1) return "Now";
+            if (minutes < 60) return `${minutes}m`;
+
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h`;
+
+            const days = Math.floor(hours / 24);
+            if (days < 30) return `${days}d`;
+
+            return date.toLocaleDateString(undefined, {
+                day: "numeric",
+                month: "short"
+            });
+        }
+
+        function openGroup(groupId) {
+            window.location.href = `/group?id=${Number(groupId)}`;
+        }
+
+        function showDashboardError(message) {
+            const activity =
+                document.getElementById("dashboardActivityContainer");
+
+            if (activity) {
+                activity.innerHTML = `
+                    <div class="empty-state dashboard-mini-empty dashboard-error">
+                        <div class="empty-state-icon">!</div>
+                        <strong>${escapeHtml(message)}</strong>
+                        <p>Please refresh the page and try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+    </script>
+
+</body>
+
+</html>

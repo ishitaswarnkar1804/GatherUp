@@ -1,0 +1,51 @@
+GATHERUP - UPDATED PATCH (email verification removed)
+=======================================================
+
+You said you couldn't even get into the dashboard, so email verification has
+been removed completely. Here's exactly what changed:
+
+1. backend/routers/auth.py
+   - /auth/register no longer sends a verification email or creates an
+     EmailVerification record. It just creates the account.
+   - /auth/login no longer checks email verification status at all. Any
+     existing account (verified or not) and any new account can log in
+     immediately with just email + password.
+
+2. frontend/js/app.js
+   - After registering, you're sent straight to /login instead of a
+     "check your email" page.
+   - Login no longer has special-case handling for a "verify your email"
+     error, since that error can no longer happen.
+
+3. frontend/dashboard.html
+   - Removed the "Email address verified / not verified" banner from the
+     Account modal, since there's nothing to verify anymore.
+
+PLUS the earlier fixes from the previous patch are still included:
+   - backend/main.py: creates the missing polls/poll_options/poll_votes
+     tables on startup (this is why polls were completely broken before).
+   - frontend/dashboard.html + group.html: fixed the missing "Chat" route
+     so the sidebar/quick-action Chat link actually opens chat.
+   - frontend/dashboard.html: browser now actually asks for notification
+     permission, so desktop chat popups can fire.
+
+IMPORTANT - your existing accounts
+-----------------------------------
+If you already have accounts stuck as "unverified" in your database, you
+don't need to do anything else - the login check is gone, so they'll log
+in immediately now.
+
+INSTALL
+-------
+1. Stop Uvicorn.
+2. Copy these files into your project, overwriting the old versions:
+     backend/main.py
+     backend/routers/auth.py
+     frontend/dashboard.html
+     frontend/group.html
+     frontend/js/app.js
+3. Restart: uvicorn backend.main:app --reload
+4. Hard-refresh your browser (Ctrl+Shift+R).
+
+You can ignore the SMTP_* settings in .env.example entirely now - they're
+no longer used for anything.

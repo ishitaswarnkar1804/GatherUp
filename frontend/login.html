@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#fbfaf7">
+    <link rel="icon" href="/assets/icons/icon-512.png">
+    <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+    <link rel="manifest" href="/manifest.json">
+    <title>Log in — GatherUp</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+
+<body>
+
+    <div class="noise"></div>
+
+    <div class="auth-page">
+
+        <div class="auth-shell">
+
+            <section class="auth-brand-panel">
+
+                <a class="brand" href="/">
+                    <span class="brand-logo">
+                        <img src="/assets/icons/logo.png" alt="GatherUp">
+                    </span>
+
+                    <span class="brand-name">
+                        Gather<span>Up</span>
+                    </span>
+                </a>
+
+                <h1>
+                    Good plans start<br>
+                    <em>with good people.</em>
+                </h1>
+
+                <p>
+                    Your shared space for events, expenses, decisions and everything in between.
+                </p>
+
+                <div class="auth-orbit"></div>
+
+            </section>
+
+
+            <section class="auth-form-panel">
+
+                <div class="form-wrap">
+
+                    <a class="back-home" href="/">
+                        ← Back to GatherUp
+                    </a>
+
+                    <div class="auth-logo-small">
+                        <img src="/assets/icons/logo.png" alt="GatherUp">
+                    </div>
+
+                    <h2 style="margin-top:18px">
+                        Welcome back.
+                    </h2>
+
+                    <p class="form-sub">
+                        Log in to continue planning with your people.
+                    </p>
+
+
+                    <form id="loginForm">
+
+                        <div class="field">
+
+                            <label for="loginEmail">
+                                Email address
+                            </label>
+
+                            <div class="field-control">
+
+                                <input id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com"
+                                    required>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="loginPassword">
+                                Password
+                            </label>
+
+                            <div class="field-control">
+
+                                <input id="loginPassword" type="password" autocomplete="current-password"
+                                    placeholder="Enter your password" required>
+
+                                <button class="password-toggle" type="button" data-password="loginPassword">
+                                    Show
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-row">
+
+                            <label class="check">
+                                <input type="checkbox">
+                                Remember me
+                            </label>
+
+                            <a class="form-link" href="#" onclick="return false">
+                                Forgot password?
+                            </a>
+
+                        </div>
+
+
+                        <button class="btn btn-primary form-submit" type="submit">
+                            Log in <span>↗</span>
+                        </button>
+
+                    </form>
+
+
+                    <p class="form-bottom">
+                        Don't have an account?
+                        <a href="/register">Create one</a>
+                    </p>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+
+    <script src="/assets/js/app.js?v=4"></script>
+
+</body>
+
+</html>

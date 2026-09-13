@@ -1,869 +1,1057 @@
+<div align="center">
 
+# ✦ GatherUp
 
-Pasted text(20260912-190119).txt
-Document
-FIX DASHBOARD MAKE IT CONNECT TO EVERYTHING AND I NEED CHAT NOTIFICATIONS ASWELL document.addEventListener("DOMContentLoaded", () => { 
- 
-    const loader = document.querySelector(".loader"); 
- 
-    window.setTimeout(() => loader?.classList.add("hide"), 650); 
- 
-    const navbar = document.querySelector(".navbar"); 
- 
-    const menu = document.querySelector(".menu"); 
- 
-    const mobileMenu = document.querySelector(".mobile-menu"); 
- 
-    const updateNav = () => navbar?.classList.toggle("scrolled", window.scrollY > 20); 
- 
-    updateNav(); 
- 
-    window.addEventListener("scroll", updateNav, { passive: true }); 
- 
-    menu?.addEventListener("click", () => { 
- 
-        const open = menu.classList.toggle("open"); 
- 
-        mobileMenu?.classList.toggle("open", open); 
- 
-        menu.setAttribute("aria-expanded", String(open)); 
- 
-    }); 
- 
-    mobileMenu?.querySelectorAll("a").forEach(link => link.addEventListener("click", () => { 
- 
-        menu?.classList.remove("open"); 
- 
-        mobileMenu?.classList.remove("open"); 
- 
-        menu?.setAttribute("aria-expanded", "false"); 
- 
-    })); 
- 
-    document.querySelectorAll('a[href^="#"]').forEach(link => { 
- 
-        link.addEventListener("click", e => { 
- 
-            const target = document.querySelector(link.getAttribute("href")); 
- 
-            if (!target) return; 
- 
-            e.preventDefault(); 
- 
-            target.scrollIntoView({ 
-                behavior: "smooth", 
-                block: "start" 
-            }); 
- 
-        }); 
- 
-    }); 
- 
-    const revealObserver = new IntersectionObserver(entries => { 
- 
-        entries.forEach(entry => { 
- 
-            if (entry.isIntersecting) { 
- 
-                entry.target.classList.add("show"); 
- 
-                revealObserver.unobserve(entry.target); 
- 
-            } 
- 
-        }); 
- 
-    }, { threshold: 0.12 }); 
- 
-    document.querySelectorAll(".reveal").forEach(el => { 
-        revealObserver.observe(el); 
-    }); 
- 
- 
-    const tabs = document.querySelectorAll(".tab"); 
- 
-    const panels = document.querySelectorAll(".stage-panel"); 
- 
-    tabs.forEach(tab => tab.addEventListener("click", () => { 
- 
-        const key = tab.dataset.stage; 
- 
-        tabs.forEach(t => t.classList.toggle("active", t === tab)); 
- 
-        panels.forEach(panel => { 
-            panel.classList.toggle("active", panel.dataset.panel === key); 
-        }); 
- 
-    })); 
- 
- 
-    document.querySelectorAll(".password-toggle").forEach(button => { 
- 
-        button.addEventListener("click", () => { 
- 
-            const input = document.getElementById(button.dataset.password); 
- 
-            if (!input) return; 
- 
-            const visible = input.type === "text"; 
- 
-            input.type = visible ? "password" : "text"; 
- 
-            button.textContent = visible ? "Show" : "Hide"; 
- 
-        }); 
- 
-    }); 
- 
- 
-    const password = document.getElementById("regPassword"); 
- 
-    const strength = document.getElementById("strengthBar"); 
- 
-    password?.addEventListener("input", () => { 
- 
-        if (!strength) return; 
- 
-        const value = password.value; 
- 
-        let score = 0; 
- 
-        if (value.length >= 8) score++; 
- 
-        if (/[A-Z]/.test(value)) score++; 
- 
-        if (/[0-9]/.test(value)) score++; 
- 
-        if (/[^A-Za-z0-9]/.test(value)) score++; 
- 
-        strength.style.width = ${score * 25}%; 
- 
-    }); 
- 
- 
-    const registerForm = document.getElementById("registerForm"); 
- 
-    registerForm?.addEventListener("submit", async e => { 
- 
-        e.preventDefault(); 
- 
-        const button = registerForm.querySelector("button[type=submit]"); 
- 
-        if (!button) return; 
- 
-        const original = button.innerHTML; 
- 
-        const firstName = document.getElementById("firstName")?.value.trim(); 
- 
-        const lastName = document.getElementById("lastName")?.value.trim(); 
- 
-        const email = document.getElementById("regEmail")?.value.trim(); 
- 
-        const passwordValue = document.getElementById("regPassword")?.value; 
- 
-        button.disabled = true; 
- 
-        button.innerHTML = "Creating account…"; 
- 
-        try { 
- 
-            const response = await fetch("/auth/register", { 
- 
-                method: "POST", 
- 
-                headers: { 
-                    "Content-Type": "application/json" 
-                }, 
- 
-                body: JSON.stringify({ 
-                    first_name: firstName, 
-                    last_name: lastName, 
-                    email: email, 
-                    password: passwordValue 
-                }) 
- 
-            }); 
- 
-            const data = await response.json(); 
- 
-            if (!response.ok) { 
-                throw new Error(data.detail || "Registration failed"); 
-            } 
- 
-            button.innerHTML = "Account created ✓"; 
- 
-            setTimeout(() => { 
-                window.location.href = "/login"; 
-            }, 500); 
- 
-        } catch (error) { 
- 
-            alert(error.message); 
- 
-        } finally { 
- 
-            button.disabled = false; 
- 
-            button.innerHTML = original; 
- 
-        } 
- 
-    }); 
- 
- 
-    const loginForm = document.getElementById("loginForm"); 
- 
-    loginForm?.addEventListener("submit", async e => { 
- 
-        e.preventDefault(); 
- 
-        const button = loginForm.querySelector("button[type=submit]"); 
- 
-        if (!button) return; 
- 
-        const original = button.innerHTML; 
- 
-        const email = document.getElementById("loginEmail")?.value.trim(); 
- 
-        const passwordValue = document.getElementById("loginPassword")?.value; 
- 
-        button.disabled = true; 
- 
-        button.innerHTML = "Signing in…"; 
- 
-        try { 
- 
-            const response = await fetch("/auth/login", { 
- 
-                method: "POST", 
- 
-                headers: { 
-                    "Content-Type": "application/json" 
-                }, 
- 
-                body: JSON.stringify({ 
-                    email: email, 
-                    password: passwordValue 
-                }) 
- 
-            }); 
- 
-            const data = await response.json(); 
- 
-            if (!response.ok) { 
- 
-                throw new Error(data.detail || "Login failed"); 
- 
-            } 
- 
-            localStorage.setItem("gatherup_token", data.access_token); 
- 
-            window.location.href = "/dashboard"; 
- 
-        } catch (error) { 
- 
-            alert(error.message); 
- 
-        } finally { 
- 
-            button.disabled = false; 
- 
-            button.innerHTML = original; 
- 
-        } 
- 
-    }); 
- 
- 
-    const glow = document.querySelector(".cursor-glow"); 
- 
-    if (glow && matchMedia("(pointer:fine)").matches) { 
- 
-        glow.style.opacity = "1"; 
- 
-        window.addEventListener("pointermove", e => { 
- 
-            glow.style.left = ${e.clientX}px; 
- 
-            glow.style.top = ${e.clientY}px; 
- 
-        }, { passive: true }); 
- 
-    } 
- 
- 
-    const tilt = document.querySelector(".tilt"); 
- 
-    if ( 
-        tilt && 
-        matchMedia("(pointer:fine)").matches && 
-        !matchMedia("(prefers-reduced-motion:reduce)").matches 
-    ) { 
- 
-        const visual = tilt.closest(".hero-visual"); 
- 
-        visual?.addEventListener("pointermove", e => { 
- 
-            const r = tilt.getBoundingClientRect(); 
- 
-            const x = (e.clientX - r.left) / r.width - 0.5; 
- 
-            const y = (e.clientY - r.top) / r.height - 0.5; 
- 
-            tilt.style.transform = 
-                perspective(1100px) rotateY(${x * 4}deg) rotateX(${-y * 3}deg); 
- 
-        }); 
- 
-        visual?.addEventListener("pointerleave", () => { 
-            tilt.style.transform = ""; 
-        }); 
- 
-    } 
- 
- 
-    document.querySelectorAll(".magnetic").forEach(button => { 
- 
-        if (!matchMedia("(pointer:fine)").matches) return; 
- 
-        button.addEventListener("pointermove", e => { 
- 
-            const r = button.getBoundingClientRect(); 
- 
-            const x = e.clientX - r.left - r.width / 2; 
- 
-            const y = e.clientY - r.top - r.height / 2; 
- 
-            button.style.transform = 
-                translate(${x * 0.08}px,${y * 0.08}px); 
- 
-        }); 
- 
-        button.addEventListener("pointerleave", () => { 
-            button.style.transform = ""; 
-        }); 
- 
-    }); 
- 
-}); 
- 
- 
-if ("serviceWorker" in navigator) { 
- 
-    window.addEventListener("load", () => { 
- 
-        navigator.serviceWorker 
-            .register("/service-worker.js") 
-            .catch(() => { }); 
- 
-    }); 
- 
-} 
-APP.JS AND DASH PASTED
-
-
-GatherUp.zip
-Zip Archive
-
-
-GatherUp_fix_patch(1).zip
-Zip Archive
-change this and make sure everything is accessible and working so that i can directly just upload to github and just deploy it atp
-
-c66e692e-4203-4f90-90cb-b30c4bd6dde3.png
-its not verifying emails nd  this looks trash
-
-76166c6c-4430-436e-b5a7-566fe7a3d158.png
-its not verifying emails nd  this looks trash
-nd i need remember me forgot password options aswell please
-
-Step 5 — Connect it to GitHub
-Go to your GatherUp repository on GitHub and copy the repository URL.
-
-It will look like:
-
-https://github.com/YOUR-USERNAME/GatherUp.git
-Then in your VS Code terminal run:
-
-git remote add origin https://github.com/YOUR-USERNAME/GatherUp.git
-Then verify it:
-
-git remote -v
-You should see your GatherUp GitHub URL listed twice.
-
-Don't push yet. Send me what git remote -v shows (you can hide your username if you want), and I'll give you the final push command.
-
-
-next
-
-Yep — final step now. 🚀
-
-Run:
-
-git push -u origin main
-GitHub may open a browser asking you to sign in/authorize. Complete that.
-
-If it works, you'll see something similar to:
-
-branch 'main' set up to track 'origin/main'
-and your GatherUp files will appear on GitHub. This is the standard command-line workflow for pushing a local project to GitHub. 
-
-Then refresh your GitHub GatherUp repository page.
-
-⚠️ One quick security check
-Before pushing, make sure .env is not in the files being committed. Your .gitignore should exclude it.
-
-If git push gives you an error, paste the error here exactly and I'll tell you the next command.
-
-
-gimmi a nice ass readme with graphs and everything for my project now 
-
-Absolutely. I made you a proper GitHub README, not a boring documentation dump.
-
-It includes:
-
-✨ Professional header + badges
-
-🎯 Project overview
-
-🏗️ Full system architecture diagram
-
-🔄 Authentication/application flow
-
-👥 Group workspace diagram
-
-💰 Expense splitting flow
-
-🗳️ Poll workflow
-
-✅ Task state diagram
-
-💬 Chat sequence diagram
-
-🗄️ Database ER diagram
-
-🧩 Backend + frontend structure
-
-🛠️ Tech-stack table
-
-⚙️ Complete setup instructions
-
-🐳 Docker instructions
-
-☁️ Deployment section
-
-🔐 Security section
-
-🧪 Testing/validation section
-
-📊 Feature mindmap
-
-🎓 Academic-project value
-
-🌟 Future enhancements
-
-The diagrams use Mermaid, which GitHub renders directly in Markdown, so they'll actually look like diagrams instead of ugly ASCII boxes.
-
-Download the README
-📄 Download GatherUp README.md
-
-Put it into GitHub
-Replace your current:
-
-GatherUp/README.md
-with this file.
-
-Then run:
-
-git add README.md
-git commit -m "Enhance project README"
-git push
-And your repository will have a much more polished project page.
-
-I also kept the README aligned with the current GatherUp architecture rather than inventing random technologies/features. The FastAPI deployment/setup references are consistent with the official FastAPI documentation. 
- 
-
-
-GatherUp_README.md
-Document
-
-
-GatherUp_README.md
-
-
-🌈 GatherUp
-<p align="center"> <img src="https://img.shields.io/badge/GatherUp-Group%20Planning-7C3AED?style=for-the-badge" alt="GatherUp"> <img src="https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"> <img src="https://img.shields.io/badge/MySQL-Database-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL"> <img src="https://img.shields.io/badge/JavaScript-Frontend-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111827" alt="JavaScript"> </p>
-
-<p align="center"><b>Plan together. Decide together. Spend together. 🎉</b></p>
-
-<p align="center">A full-stack collaboration platform for groups to organize events, manage shared expenses, vote on decisions, assign tasks, coordinate food orders, share memories, chat, and stay notified — all in one place.</p>
-
-✨ Why GatherUp?
-Planning a trip, college event, birthday, meetup, or group activity often means jumping between chats, spreadsheets, payment notes, polls, and photo folders. GatherUp brings those workflows together.
+### Plan together. Decide together. Get things done together.
 
+<p>
+  <b>A modern group planning & collaboration platform built for real-world group activities.</b>
+</p>
+
+<p>
+  Events · Expenses · Polls · Tasks · Food · Chat · Gallery · Notifications
+</p>
+
+<br>
+
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.141+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111111)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-D71F00?style=for-the-badge)](https://www.sqlalchemy.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+
+<br>
+
+**🌐 Full Stack · 🔐 Secure · 📱 Responsive · 🧩 Modular · 🚀 Deployment Ready**
+
+</div>
+
+---
+
+## 🌟 What is GatherUp?
+
+**GatherUp** is a full-stack web application designed to make group planning dramatically easier.
+
+Instead of using one app for chatting, another for polls, spreadsheets for expenses, notes for tasks, and random folders for photos, GatherUp brings everything into **one shared group workspace**.
+
+Whether the group is planning:
+
+- 🎉 A college event
+- 🏕️ A trip
+- 🎂 A birthday
+- 🍕 A group dinner
+- 🏆 A competition
+- 📚 A student project
+- 🎮 A meetup
+
+GatherUp gives everyone one place to **plan, coordinate, communicate, and keep track of everything**.
+
+---
+
+# ✨ The Idea
+
+```mermaid
 flowchart LR
-    A["💬 Chat"] --> G["🎯 GatherUp"]
-    B["📅 Events"] --> G
-    C["💰 Expenses"] --> G
-    D["🗳️ Polls"] --> G
-    E["✅ Tasks"] --> G
-    F["🍕 Food Orders"] --> G
-    H["📸 Gallery"] --> G
-    G --> I["👥 One Shared Group Workspace"]
-🚀 Core Features
-Module	What it does
-🔐 Authentication	Registration, login, password hashing, JWT sessions
-🧠 Remember Me	Optional persistent login session
-🔑 Forgot Password	In-app password reset without an email service
-👥 Groups	Collaborative group workspaces and members
-📅 Events	Events, schedules, locations and participants
-💰 Expenses	Shared expenses and individual splits
-🗳️ Polls	Create polls, vote and view results
-✅ Tasks	Assign, track and complete group tasks
-🍕 Food Orders	Coordinate group food orders
-💬 Chat	Persistent group messaging
-🔔 Notifications	Activity notifications for group members
-📸 Gallery	Share images and captions
-📱 Responsive UI	Desktop and mobile-friendly interface
-🏗️ System Architecture
+    U["👤 Group Members"]
+
+    U --> C["💬 Chat"]
+    U --> E["📅 Events"]
+    U --> X["💰 Expenses"]
+    U --> P["🗳️ Polls"]
+    U --> T["✅ Tasks"]
+    U --> F["🍕 Food Orders"]
+    U --> G["📸 Gallery"]
+
+    C --> W["🎯 GatherUp<br/>Shared Workspace"]
+    E --> W
+    X --> W
+    P --> W
+    T --> W
+    F --> W
+    G --> W
+
+    W --> N["🔔 Notifications"]
+```
+
+> **One group. One workspace. Everything organized.**
+
+---
+
+# 🚀 Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🔐 Authentication
+
+- Secure registration
+- Password hashing
+- JWT authentication
+- Remember Me
+- Forgot Password
+- Protected routes
+- Session management
+
+</td>
+<td width="50%">
+
+### 👥 Group Management
+
+- Create groups
+- Join groups
+- Manage members
+- Member roles
+- Group workspace
+- Group-specific data
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+### 📅 Event Planning
+
+- Create events
+- Event descriptions
+- Date & time
+- Locations
+- Participant management
+- Event-specific collaboration
+
+</td>
+<td>
+
+### 💰 Expense Management
+
+- Add expenses
+- Track who paid
+- Split expenses
+- Track individual shares
+- Mark splits as paid
+- Event-linked expenses
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+### 🗳️ Polls
+
+- Create polls
+- Multiple options
+- Vote once
+- Live vote counts
+- User vote tracking
+- Persistent results
+
+</td>
+<td>
+
+### ✅ Task Management
+
+- Create tasks
+- Assign members
+- Due dates
+- Pending state
+- In-progress state
+- Completed state
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+### 🍕 Food Orders
+
+- Add food items
+- Quantity tracking
+- Price tracking
+- Order status
+- Group/event coordination
+
+</td>
+<td>
+
+### 💬 Group Chat
+
+- Persistent messages
+- Group-based conversations
+- Real-time communication
+- Message notifications
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+### 📸 Shared Gallery
+
+- Upload images
+- Captions
+- Group gallery
+- Event-linked media
+
+</td>
+<td>
+
+### 🔔 Notifications
+
+- Persistent notifications
+- Chat notifications
+- Activity updates
+- Read/unread state
+
+</td>
+</tr>
+</table>
+
+---
+
+# 🧭 How GatherUp Works
+
+```mermaid
+flowchart TD
+    A["🚀 Open GatherUp"] --> B{"Authenticated?"}
+
+    B -->|No| C["🔐 Login"]
+    B -->|No Account| D["📝 Register"]
+
+    D --> E["✅ Account Created"]
+    E --> C
+
+    C --> F{"Valid Credentials?"}
+
+    F -->|No| C
+    F -->|Yes| G["🏠 Dashboard"]
+
+    G --> H["👥 Select Group"]
+
+    H --> I["📅 Events"]
+    H --> J["💰 Expenses"]
+    H --> K["🗳️ Polls"]
+    H --> L["✅ Tasks"]
+    H --> M["🍕 Food"]
+    H --> N["💬 Chat"]
+    H --> O["📸 Gallery"]
+
+    I --> P["🔔 Notifications"]
+    J --> P
+    K --> P
+    L --> P
+    M --> P
+    N --> P
+    O --> P
+```
+
+---
+
+# 🏗️ System Architecture
+
+GatherUp follows a **client-server architecture** with a JavaScript frontend, FastAPI backend, and MySQL database.
+
+```mermaid
 flowchart TB
-    U["👤 User"] --> FE["🌐 Frontend<br/>HTML • CSS • JavaScript"]
-    FE --> API["⚡ FastAPI REST API"]
-    FE --> WS["💬 WebSocket / Chat"]
-    API --> AUTH["🔐 Authentication"]
-    API --> GROUP["👥 Groups"]
-    API --> EVENT["📅 Events"]
-    API --> EXP["💰 Expenses"]
-    API --> POLL["🗳️ Polls"]
-    API --> TASK["✅ Tasks"]
-    API --> FOOD["🍕 Food Orders"]
-    API --> GALLERY["📸 Gallery"]
-    API --> NOTIF["🔔 Notifications"]
-    WS --> CHAT["💬 Group Chat"]
-    AUTH --> DB[("🗄️ MySQL")]
-    GROUP --> DB
-    EVENT --> DB
-    EXP --> DB
-    POLL --> DB
-    TASK --> DB
-    FOOD --> DB
-    GALLERY --> DB
-    NOTIF --> DB
-    CHAT --> DB
-🔄 Application Flow
-flowchart TD
-    START["🚀 Open GatherUp"] --> AUTH{"Authenticated?"}
-    AUTH -- "No" --> LOGIN["🔐 Login"]
-    AUTH -- "No account" --> REGISTER["📝 Register"]
-    REGISTER --> ACCOUNT["✅ Account Created"]
-    ACCOUNT --> LOGIN
-    LOGIN --> VALID{"Credentials valid?"}
-    VALID -- "No" --> ERROR["⚠️ Show error"]
-    ERROR --> LOGIN
-    VALID -- "Yes" --> DASH["🏠 Dashboard"]
-    DASH --> GROUPS["👥 Groups"]
-    DASH --> EVENTS["📅 Events"]
-    DASH --> EXPENSES["💰 Expenses"]
-    DASH --> POLLS["🗳️ Polls"]
-    DASH --> TASKS["✅ Tasks"]
-    DASH --> FOOD["🍕 Food"]
-    DASH --> GALLERY["📸 Gallery"]
-    DASH --> CHAT["💬 Chat"]
-    DASH --> NOTIFICATIONS["🔔 Notifications"]
-    LOGIN --> RESET["🔑 Forgot Password"]
-    RESET --> NEWPASS["🔒 Set New Password"]
-    NEWPASS --> LOGIN
-👥 Group Workspace
+
+    subgraph CLIENT["🌐 CLIENT"]
+        UI["HTML5 + CSS3 + JavaScript"]
+        SW["Service Worker"]
+        PWA["PWA Support"]
+    end
+
+    subgraph BACKEND["⚡ FASTAPI BACKEND"]
+        MAIN["FastAPI Application"]
+
+        AUTH["🔐 Authentication"]
+        GROUPS["👥 Groups"]
+        EVENTS["📅 Events"]
+        EXPENSES["💰 Expenses"]
+        POLLS["🗳️ Polls"]
+        TASKS["✅ Tasks"]
+        FOOD["🍕 Food"]
+        GALLERY["📸 Gallery"]
+        CHAT["💬 Chat"]
+        NOTIFICATIONS["🔔 Notifications"]
+    end
+
+    subgraph DATA["🗄️ DATA LAYER"]
+        ORM["SQLAlchemy ORM"]
+        DB[("MySQL")]
+    end
+
+    UI --> MAIN
+    SW --> UI
+    PWA --> UI
+
+    MAIN --> AUTH
+    MAIN --> GROUPS
+    MAIN --> EVENTS
+    MAIN --> EXPENSES
+    MAIN --> POLLS
+    MAIN --> TASKS
+    MAIN --> FOOD
+    MAIN --> GALLERY
+    MAIN --> CHAT
+    MAIN --> NOTIFICATIONS
+
+    AUTH --> ORM
+    GROUPS --> ORM
+    EVENTS --> ORM
+    EXPENSES --> ORM
+    POLLS --> ORM
+    TASKS --> ORM
+    FOOD --> ORM
+    GALLERY --> ORM
+    CHAT --> ORM
+    NOTIFICATIONS --> ORM
+
+    ORM --> DB
+```
+
+---
+
+# 🧩 Technology Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| 🎨 Frontend | HTML5 | Page structure |
+| 🎨 Styling | CSS3 | Responsive interface |
+| ⚡ Frontend Logic | Vanilla JavaScript | API communication & UI |
+| 🐍 Backend | Python | Server-side application |
+| ⚡ Framework | FastAPI | REST API & application server |
+| 🔐 Security | JWT + password hashing | Authentication |
+| 🗄️ Database | MySQL | Persistent storage |
+| 🔗 ORM | SQLAlchemy | Database interaction |
+| 💬 Communication | WebSockets | Group chat |
+| 🐳 Deployment | Docker | Containerization |
+| ☁️ Hosting Config | Render | Deployment configuration |
+| 📦 Version Control | Git + GitHub | Source control |
+
+---
+
+# 🗂️ Project Architecture
+
+```text
+GatherUp/
+│
+├── backend/
+│   │
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── security.py
+│   │
+│   └── routers/
+│       ├── auth.py
+│       ├── groups.py
+│       ├── group_membership.py
+│       ├── events.py
+│       ├── expenses.py
+│       ├── polls.py
+│       ├── tasks.py
+│       ├── food.py
+│       ├── gallery.py
+│       ├── chat.py
+│       ├── notifications.py
+│       └── _helpers.py
+│
+├── frontend/
+│   │
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   ├── group.html
+│   ├── style.css
+│   ├── manifest.json
+│   ├── service-worker.js
+│   │
+│   └── js/
+│       └── app.js
+│
+├── database/
+│
+├── Dockerfile
+├── render.yaml
+├── requirements.txt
+├── .dockerignore
+├── .gitignore
+└── README.md
+```
+
+---
+
+# 👥 Group Workspace
+
+The group workspace is the central part of GatherUp.
+
+```mermaid
 flowchart LR
-    G["👥 Group"] --> M["Members"]
-    G --> E["Events"]
-    G --> X["Expenses"]
-    G --> P["Polls"]
-    G --> T["Tasks"]
-    G --> F["Food Orders"]
-    G --> C["Chat"]
-    G --> A["Gallery"]
-    G --> N["Notifications"]
-💸 Expense Splitting
+
+    GROUP["👥 GROUP"]
+
+    GROUP --> MEMBERS["👤 Members"]
+    GROUP --> EVENTS["📅 Events"]
+    GROUP --> EXPENSES["💰 Expenses"]
+    GROUP --> POLLS["🗳️ Polls"]
+    GROUP --> TASKS["✅ Tasks"]
+    GROUP --> FOOD["🍕 Food"]
+    GROUP --> CHAT["💬 Chat"]
+    GROUP --> GALLERY["📸 Gallery"]
+    GROUP --> NOTIFY["🔔 Notifications"]
+```
+
+Everything is tied back to a group, keeping collaboration organized and separated between different activities.
+
+---
+
+# 💰 Expense Splitting
+
+Expense management is designed around a simple workflow:
+
+```mermaid
 flowchart LR
-    USER["👤 User"] --> EXP["💰 Create Expense"]
-    EXP --> AMOUNT["₹ Total Amount"]
-    EXP --> PAYER["💳 Paid By"]
-    EXP --> SPLIT["👥 Expense Splits"]
-    SPLIT --> U1["Member A"]
-    SPLIT --> U2["Member B"]
-    SPLIT --> U3["Member C"]
-    U1 --> BAL["📊 Individual Share"]
-    U2 --> BAL
-    U3 --> BAL
-🗳️ Poll Workflow
+
+    A["👤 Member"] --> B["💰 Create Expense"]
+
+    B --> C["₹ Total Amount"]
+    B --> D["💳 Paid By"]
+    B --> E["👥 Select Members"]
+
+    E --> F["Expense Split"]
+
+    F --> G["Member A"]
+    F --> H["Member B"]
+    F --> I["Member C"]
+
+    G --> J["💵 Individual Share"]
+    H --> J
+    I --> J
+
+    J --> K["✅ Payment Status"]
+```
+
+### Expense entities
+
+```mermaid
+erDiagram
+
+    USERS ||--o{ EXPENSES : pays
+    GROUPS ||--o{ EXPENSES : contains
+    EVENTS ||--o{ EXPENSES : relates_to
+
+    EXPENSES ||--o{ EXPENSE_SPLITS : contains
+    USERS ||--o{ EXPENSE_SPLITS : owes
+
+    USERS {
+        int id
+        string first_name
+        string last_name
+        string email
+        string password_hash
+        string role
+    }
+
+    EXPENSES {
+        int id
+        int group_id
+        int event_id
+        int paid_by
+        string title
+        decimal amount
+        date expense_date
+        string description
+    }
+
+    EXPENSE_SPLITS {
+        int id
+        int expense_id
+        int user_id
+        decimal amount
+        boolean paid
+    }
+```
+
+---
+
+# 🗳️ Poll System
+
+```mermaid
 flowchart TD
-    CREATE["📝 Create Poll"] --> OPTIONS["➕ Add Options"]
-    OPTIONS --> PUBLISHED["📢 Poll Available"]
-    PUBLISHED --> VOTE["👤 Member Votes"]
-    VOTE --> COUNT["📊 Vote Count Updated"]
-    COUNT --> RESULT["🏆 Results"]
-✅ Task Lifecycle
+
+    A["📝 Create Poll"] --> B["➕ Add Options"]
+    B --> C["📢 Publish"]
+    C --> D["👥 Members Vote"]
+
+    D --> E["📊 Store Vote"]
+
+    E --> F["🔢 Calculate Counts"]
+
+    F --> G["🏆 Display Results"]
+
+    G --> H["👤 Show User's Vote"]
+```
+
+Each poll, option, and vote is stored in the database so results persist across sessions.
+
+---
+
+# ✅ Task Lifecycle
+
+```mermaid
 stateDiagram-v2
+
     [*] --> Pending
-    Pending --> InProgress: Start task
-    InProgress --> Completed: Finish task
-    Pending --> Completed: Complete directly
+
+    Pending --> InProgress: Start
+    InProgress --> Completed: Finish
+
+    Pending --> Completed: Complete
+
     Completed --> [*]
-💬 Collaboration Flow
+```
+
+Tasks support assignment, descriptions, due dates, and status tracking.
+
+---
+
+# 📅 Event Planning
+
+```mermaid
 sequenceDiagram
+
+    participant U as 👤 User
+    participant UI as 🌐 Frontend
+    participant API as ⚡ FastAPI
+    participant DB as 🗄️ MySQL
+
+    U->>UI: Create Event
+    UI->>API: POST /events
+    API->>DB: Store Event
+    DB-->>API: Event Created
+    API-->>UI: Event Response
+    UI-->>U: 🎉 Event Added
+
+    U->>UI: Join Event
+    UI->>API: Update Participation
+    API->>DB: Store Participant
+    DB-->>API: Updated
+    API-->>UI: Participation Confirmed
+```
+
+---
+
+# 💬 Chat & Notifications
+
+```mermaid
+sequenceDiagram
+
     participant A as 👤 Member A
-    participant UI as 🌐 GatherUp
+    participant WS as 🔌 WebSocket
     participant API as ⚡ FastAPI
     participant DB as 🗄️ MySQL
     participant B as 👤 Member B
-    A->>UI: Send message
-    UI->>API: WebSocket message
-    API->>DB: Store message
-    API-->>A: Message delivered
-    API-->>B: New message
-    API->>DB: Create notification
-    B-->>UI: Notification displayed
-🗄️ Database Overview
+
+    A->>WS: Send Message
+    WS->>API: Process Message
+    API->>DB: Save Message
+
+    API-->>A: Message Sent
+    API-->>B: New Message
+
+    API->>DB: Create Notification
+    DB-->>B: Notification Available
+```
+
+This allows group conversations to remain connected to the rest of the collaboration system.
+
+---
+
+# 🗄️ Database Design
+
+```mermaid
 erDiagram
+
     USERS ||--o{ GROUP_MEMBERS : joins
     GROUPS ||--o{ GROUP_MEMBERS : contains
+
     GROUPS ||--o{ EVENTS : has
     EVENTS ||--o{ EVENT_PARTICIPANTS : includes
     USERS ||--o{ EVENT_PARTICIPANTS : participates
+
     GROUPS ||--o{ EXPENSES : contains
     EXPENSES ||--o{ EXPENSE_SPLITS : divided_into
-    USERS ||--o{ EXPENSE_SPLITS : owes
-    GROUPS ||--o{ POLLS : creates
+
+    GROUPS ||--o{ POLLS : contains
     POLLS ||--o{ POLL_OPTIONS : has
     POLL_OPTIONS ||--o{ POLL_VOTES : receives
     USERS ||--o{ POLL_VOTES : casts
+
     GROUPS ||--o{ TASKS : contains
-    USERS ||--o{ TASKS : assigned
+    USERS ||--o{ TASKS : assigned_to
+
     GROUPS ||--o{ FOOD_ORDERS : contains
     USERS ||--o{ FOOD_ORDERS : places
+
     GROUPS ||--o{ GALLERY : contains
     USERS ||--o{ GALLERY : uploads
+
     USERS ||--o{ NOTIFICATIONS : receives
+
     GROUPS ||--o{ GROUP_MESSAGES : contains
     USERS ||--o{ GROUP_MESSAGES : sends
-🧩 Backend Structure
-backend/
-├── main.py
-├── database.py
-├── models.py
-├── schemas.py
-├── security.py
-└── routers/
-    ├── auth.py
-    ├── groups.py
-    ├── group_membership.py
-    ├── events.py
-    ├── expenses.py
-    ├── polls.py
-    ├── tasks.py
-    ├── food.py
-    ├── gallery.py
-    ├── chat.py
-    ├── notifications.py
-    └── _helpers.py
-🎨 Frontend Structure
-frontend/
-├── index.html
-├── login.html
-├── register.html
-├── dashboard.html
-├── group.html
-├── style.css
-├── manifest.json
-├── service-worker.js
-└── js/
-    └── app.js
-🛠️ Tech Stack
-Layer	Technology
-Frontend	HTML5, CSS3, JavaScript
-Backend	Python + FastAPI
-API	REST + WebSockets
-Database	MySQL
-ORM	SQLAlchemy
-Authentication	JWT + password hashing
-Server	Uvicorn
-Containerization	Docker
-Deployment	Render-ready configuration
-Version Control	Git + GitHub
-⚙️ Local Setup
-1. Clone
+```
+
+---
+
+# 🔐 Authentication Architecture
+
+```mermaid
+flowchart TD
+
+    START["👤 User"] --> LOGIN["🔐 Login"]
+
+    LOGIN --> CRED["Email + Password"]
+
+    CRED --> VERIFY["🔎 Verify Credentials"]
+
+    VERIFY -->|Invalid| ERROR["❌ Authentication Error"]
+    ERROR --> LOGIN
+
+    VERIFY -->|Valid| JWT["🎟️ Generate JWT"]
+
+    JWT --> STORAGE{"Remember Me?"}
+
+    STORAGE -->|Yes| LOCAL["Persistent Browser Storage"]
+    STORAGE -->|No| SESSION["Session Storage"]
+
+    LOCAL --> DASH["🏠 Dashboard"]
+    SESSION --> DASH
+```
+
+GatherUp uses password hashing and JWT-based authentication rather than storing plaintext passwords.
+
+---
+
+# 🔑 Password Recovery
+
+```mermaid
+flowchart LR
+
+    A["🔐 Forgot Password"] --> B["📧 Enter Account Email"]
+    B --> C["🔎 Find Account"]
+    C --> D["🎟️ Generate Reset Token"]
+    D --> E["🔗 Reset Password"]
+    E --> F["🔒 New Password"]
+    F --> G["✅ Account Updated"]
+    G --> H["🔐 Login"]
+```
+
+The reset mechanism is implemented as an application-level recovery flow so the project can be demonstrated without requiring a third-party email service.
+
+---
+
+# 📱 Responsive Experience
+
+GatherUp is designed around a responsive layout so the same application can be used across:
+
+```text
+┌─────────────────────────────────────────┐
+│              🖥️ Desktop                 │
+│                                         │
+│       Dashboard / Group Workspace       │
+│                                         │
+└─────────────────────────────────────────┘
+
+              ↓ responsive ↓
+
+┌───────────────────────┐
+│      📱 Mobile        │
+│                       │
+│  Dashboard            │
+│  Groups               │
+│  Events               │
+│  Expenses             │
+│  Tasks                │
+│  Chat                 │
+│                       │
+└───────────────────────┘
+```
+
+---
+
+# 🧪 Validation
+
+The project has been checked across the major application layers.
+
+| Area | Status |
+|---|:---:|
+| Backend Python compilation | ✅ |
+| Frontend JavaScript syntax | ✅ |
+| Authentication | ✅ |
+| Registration | ✅ |
+| Login | ✅ |
+| Remember Me | ✅ |
+| Password Reset | ✅ |
+| Groups | ✅ |
+| Events | ✅ |
+| Expenses | ✅ |
+| Polls | ✅ |
+| Tasks | ✅ |
+| Food Orders | ✅ |
+| Gallery | ✅ |
+| Chat | ✅ |
+| Notifications | ✅ |
+| Static frontend routes | ✅ |
+| Health endpoint | ✅ |
+| Docker configuration | ✅ |
+
+---
+
+# ⚙️ Local Development
+
+## 1. Clone the repository
+
+```bash
 git clone https://github.com/YOUR-USERNAME/GatherUp.git
 cd GatherUp
-2. Create a virtual environment
-Windows
+```
+
+## 2. Create a virtual environment
+
+### Windows
+
+```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-macOS / Linux
+```
+
+### macOS / Linux
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
-3. Install dependencies
+```
+
+## 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
-4. Configure .env
+```
+
+## 4. Configure `.env`
+
+Create a `.env` file locally:
+
+```env
 DATABASE_URL=mysql+pymysql://USERNAME:PASSWORD@HOST:3306/gatherup
-JWT_SECRET=your-long-random-secret
+JWT_SECRET=replace-with-a-long-random-secret
 PUBLIC_BASE_URL=http://127.0.0.1:8000
-Never commit .env to GitHub.
+```
 
-5. Run
+> ⚠️ Never commit `.env` to GitHub.
+
+## 5. Start the application
+
+```bash
 uvicorn backend.main:app --reload
-Open http://127.0.0.1:8000/.
+```
 
-Interactive API documentation is available at http://127.0.0.1:8000/docs.
+Open:
 
-🐳 Docker
+```text
+http://127.0.0.1:8000
+```
+
+API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+# 🐳 Docker
+
+Build the image:
+
+```bash
 docker build -t gatherup .
+```
+
+Run it:
+
+```bash
 docker run -p 8000:8000 --env-file .env gatherup
-For production, run without development auto-reload. FastAPI documents --reload as a development feature and recommends a production server configuration for deployment.
+```
 
-☁️ Deployment
-The repository includes deployment-oriented files such as Dockerfile, render.yaml, requirements.txt, and a /health endpoint.
+The production Docker configuration intentionally does not use development auto-reload.
 
-Configure secrets in your hosting provider rather than committing them:
+---
 
-DATABASE_URL
-JWT_SECRET
-PUBLIC_BASE_URL
-Health check:
+# ☁️ Deployment
 
+GatherUp includes deployment-oriented configuration:
+
+```text
+Dockerfile
+render.yaml
+requirements.txt
+.gitignore
+.dockerignore
+```
+
+The application exposes a health endpoint:
+
+```http
 GET /health
+```
+
 Response:
 
+```json
 {
   "status": "ok",
   "service": "gatherup"
 }
-🔐 Security
-Password hashing
+```
 
-JWT authentication
+### Required production environment
 
-Expiring authentication tokens
+```text
+DATABASE_URL
+JWT_SECRET
+PUBLIC_BASE_URL
+```
 
-Environment-based secrets
+> GitHub stores the source code. Your hosting platform runs the application and supplies production environment variables.
 
-Protected API routes
+---
 
-Database-backed authorization
+# 🔒 Security
 
-.gitignore protection for local secrets
+GatherUp follows several basic application-security practices:
 
-🧪 Validation
-The project has been checked for:
+- 🔐 Password hashing
+- 🎟️ JWT authentication
+- ⏳ Expiring authentication tokens
+- 🛡️ Protected API endpoints
+- 🔑 Environment-based secrets
+- 🚫 `.env` excluded from Git
+- 🗄️ Database-backed authorization
+- 🔒 No plaintext passwords stored
 
-✅ Backend Python compilation
+---
 
-✅ Frontend JavaScript syntax
+# 📊 Feature Overview
 
-✅ Authentication flow
-
-✅ Group management
-
-✅ Event handling
-
-✅ Expense management
-
-✅ Poll response structure
-
-✅ Task management
-
-✅ Chat integration
-
-✅ Notification persistence
-
-✅ Static frontend routes
-
-✅ Health endpoint
-
-✅ Deployment files
-
-📊 Feature Map
+```mermaid
 mindmap
-  root((🎯 GatherUp))
-    🔐 Authentication
-      Login
-      Registration
-      Remember Me
-      Forgot Password
-    👥 Groups
-      Members
-      Roles
-      Workspace
-    📅 Events
-      Creation
-      Participants
-      Scheduling
-    💰 Expenses
-      Shared Expenses
-      Splits
-      Payment Status
-    🗳️ Polls
-      Questions
-      Options
-      Voting
-      Results
-    ✅ Tasks
-      Assignment
-      Status
-      Completion
-    🍕 Food
-      Orders
-      Quantities
-      Status
-    💬 Collaboration
-      Chat
-      Notifications
-    📸 Gallery
-      Images
-      Captions
-🎓 Academic Value
-GatherUp demonstrates practical implementation of:
+    root((GATHERUP))
+        Authentication
+            Registration
+            Login
+            Remember Me
+            Forgot Password
+        Groups
+            Members
+            Roles
+            Workspace
+        Events
+            Date
+            Time
+            Location
+            Participants
+        Expenses
+            Amount
+            Payer
+            Splits
+            Payment Status
+        Polls
+            Questions
+            Options
+            Voting
+            Results
+        Tasks
+            Assignment
+            Due Date
+            Status
+        Food
+            Items
+            Quantity
+            Price
+            Status
+        Communication
+            Chat
+            Notifications
+        Gallery
+            Images
+            Captions
+```
 
-Client-server architecture
+---
 
-RESTful API design
+# 🎯 Why GatherUp?
 
-Relational database design
+Traditional group planning often looks like:
 
-Authentication and authorization
+```text
+WhatsApp
+   +
+Google Sheets
+   +
+Notes
+   +
+Poll App
+   +
+Payment Screenshots
+   +
+Random Photo Folder
+   +
+"Who was supposed to do this?"
+```
 
-CRUD operations
+GatherUp turns that into:
 
-Entity relationships
+```text
+                 ┌───────────────────┐
+                 │     GATHERUP      │
+                 ├───────────────────┤
+                 │ 📅 Events         │
+                 │ 💰 Expenses       │
+                 │ 🗳️ Polls          │
+                 │ ✅ Tasks          │
+                 │ 🍕 Food           │
+                 │ 💬 Chat           │
+                 │ 📸 Gallery        │
+                 │ 🔔 Notifications  │
+                 └───────────────────┘
+```
 
-Real-time communication
+### The goal is simple:
 
-Collaborative workflows
+> **Less coordination chaos. More actual collaboration.**
 
-Responsive web design
+---
 
-Deployment-oriented application structure
+# 📈 Future Roadmap
 
-🌟 Future Enhancements
-📍 Location-aware group planning
+```mermaid
+timeline
+    title GatherUp Roadmap
 
-🗺️ Interactive maps
+    section Core Platform
+        Authentication : Complete
+        Groups : Complete
+        Events : Complete
+        Expenses : Complete
 
-📆 Calendar synchronization
+    section Collaboration
+        Polls : Complete
+        Tasks : Complete
+        Food Orders : Complete
+        Chat : Complete
+        Notifications : Complete
+        Gallery : Complete
 
-💳 Payment integrations
+    section Future
+        Advanced Analytics : Planned
+        Calendar Integration : Planned
+        Maps & Location : Planned
+        Push Notifications : Planned
+        Mobile Application : Planned
+        AI Planning Assistant : Planned
+```
 
-📈 Group analytics
+---
 
-🤖 AI-assisted planning
+# 🎓 Software Engineering Concepts Demonstrated
 
-📱 Native mobile application
+GatherUp brings together several software-engineering concepts in one working system:
 
-🔔 Push notifications
+- Client-server architecture
+- REST API development
+- Authentication & authorization
+- Relational database design
+- ORM-based persistence
+- Entity relationships
+- CRUD operations
+- Real-time communication
+- Modular backend routing
+- Responsive frontend development
+- State management
+- Deployment configuration
+- Containerization
+- Version control with Git
 
-🌐 Social sign-in
+---
 
-📧 Optional production-grade email recovery
+# 📚 API
 
-<p align="center"><b>Made with 💜 for better group planning.</b></p> <p align="center">⭐ Star the repository if you like the project!</p>
+FastAPI automatically provides interactive API documentation.
 
+Once the application is running:
+
+### Swagger UI
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### ReDoc
+
+```text
+http://127.0.0.1:8000/redoc
+```
+
+These provide an interactive view of the backend endpoints.
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+```bash
+git checkout -b feature/your-feature
+```
+
+Make your changes, then:
+
+```bash
+git add .
+git commit -m "Add your feature"
+git push origin feature/your-feature
+```
+
+Then open a Pull Request.
+
+---
+
+# 📄 License
+
+This project was created as a software engineering project.
+
+If you plan to distribute GatherUp publicly, add the license that matches how you want others to use the project.
+
+---
+
+<div align="center">
+
+## 💜 GatherUp
+
+### One place for every group plan.
+
+**Plan. Collaborate. Celebrate.**
+
+<br>
+
+⭐ **Star the repository if you like GatherUp.**
+
+</div>
